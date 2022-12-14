@@ -34,14 +34,7 @@ public class SwaggerConfig implements WebMvcConfigurer{
 									.build());
 	}
 	
-	@Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-//            registry.addRedirectViewController("/doc/v2/api-docs", "/v2/api-docs?group=restful-api");
-//            registry.addRedirectViewController("/doc/swagger-resources/configuration/ui","/swagger-resources/configuration/ui");
-//            registry.addRedirectViewController("/doc/swagger-resources/configuration/security","/swagger-resources/configuration/security");
-//            registry.addRedirectViewController("/doc/swagger-resources", "/swagger-resources");
-    }
-	
+
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		
