@@ -16,7 +16,6 @@ public class SidesController {
 	
 	@GetMapping("/version")
 	public BuildProperties version() {
-		
 		return buildProperties;
 	}	
 	
