@@ -5,6 +5,7 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -32,6 +33,14 @@ public class SwaggerConfig implements WebMvcConfigurer{
 									.description(buildProperties.getName())
 									.build());
 	}
+	
+	@Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+//            registry.addRedirectViewController("/doc/v2/api-docs", "/v2/api-docs?group=restful-api");
+//            registry.addRedirectViewController("/doc/swagger-resources/configuration/ui","/swagger-resources/configuration/ui");
+//            registry.addRedirectViewController("/doc/swagger-resources/configuration/security","/swagger-resources/configuration/security");
+//            registry.addRedirectViewController("/doc/swagger-resources", "/swagger-resources");
+    }
 	
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
