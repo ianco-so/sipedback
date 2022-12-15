@@ -25,20 +25,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			WebRequest request) {
 		
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		ProblemType problemType = ProblemType.RECURSO_NAO_ENCONTRADO;
+		ErroExceptionType problemType = ErroExceptionType.RECURSO_NAO_ENCONTRADO;
 		String detail = ex.getMessage();
 		
-		Problem problem = createProblemBuilder(status, problemType, detail)
+		ErroException problem = createProblemBuilder(status, problemType, detail)
 				.userMessage(detail)
 				.build();
 		
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 	}
 	
-	private Problem.ProblemBuilder createProblemBuilder(HttpStatus status,
-			ProblemType problemType, String detail) {
+	private ErroException.ErroExceptionBuilder createProblemBuilder(HttpStatus status,
+			ErroExceptionType problemType, String detail) {
 		
-		return Problem.builder()
+		return ErroException.builder()
 			.timestamp(OffsetDateTime.now())
 			.status(status.value())
 			.type(problemType.getUri())
