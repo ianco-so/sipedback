@@ -21,28 +21,27 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
 	
 	@ExceptionHandler(EntidadeNaoEncontradaException.class)
-	public ResponseEntity<?> handleEntidadeNaoEncontrada(EntidadeNaoEncontradaException ex,
-			WebRequest request) {
+	public ResponseEntity<?> handleEntidadeNaoEncontrada(EntidadeNaoEncontradaException ex,	WebRequest request) {
 		
 		HttpStatus status = HttpStatus.NOT_FOUND;
-		ErroExceptionType problemType = ErroExceptionType.RECURSO_NAO_ENCONTRADO;
+		ErroExceptionType erroExceptionType = ErroExceptionType.RECURSO_NAO_ENCONTRADO;
 		String detail = ex.getMessage();
 		
-		ErroException problem = createProblemBuilder(status, problemType, detail)
+		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)
 				.userMessage(detail)
 				.build();
 		
-		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
+		return handleExceptionInternal(ex, erroException, new HttpHeaders(), status, request);
 	}
 	
 	private ErroException.ErroExceptionBuilder createProblemBuilder(HttpStatus status,
-			ErroExceptionType problemType, String detail) {
+			ErroExceptionType erroExceptionType, String detail) {
 		
 		return ErroException.builder()
 			.timestamp(OffsetDateTime.now())
 			.status(status.value())
-			.type(problemType.getUri())
-			.title(problemType.getTitle())
+			.type(erroExceptionType.getUri())
+			.title(erroExceptionType.getTitle())
 			.detail(detail);
 	}
 
