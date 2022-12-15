@@ -22,9 +22,6 @@ public class SidesController {
 	
 	@GetMapping("/version")
 	public BuildProperties version() {
-		
-//		Usuario usuario = cadastroUsuarioService.localizarUsuario(1L);
-		
 		return buildProperties;
 	}	
 	

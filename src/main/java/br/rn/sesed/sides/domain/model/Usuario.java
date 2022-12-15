@@ -1,5 +1,6 @@
 package br.rn.sesed.sides.domain.model;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -20,5 +21,18 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Column(name="st_nome")
+	private String nome;
 	
+	@Column(name="st_cpf")
+	private String cpf;
+	
+	@Column(name="st_email")
+	private String email;
+	
+	@Column(name="st_telefone")
+	private String telefone;
+	
+	@Column(name="st_senha")
+	private String senha;
 }
