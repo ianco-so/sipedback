@@ -14,7 +14,7 @@ public class JpaConfig {
 	public DataSource dataSource() {
 		
 		JndiDataSourceLookup dataSourceLookup = new JndiDataSourceLookup();
-		DataSource dataSource = dataSourceLookup.getDataSource("java:/rotafxDS");
+		DataSource dataSource = dataSourceLookup.getDataSource("java:/sidesDS");
 		return dataSource;
 	}
 	
