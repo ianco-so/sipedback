@@ -3,6 +3,7 @@ package br.rn.sesed.sides.api.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -13,11 +14,12 @@ import br.rn.sesed.sides.api.model.json.UsuarioJson;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
 import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.service.CadastroUsuarioService;
+import br.rn.sesed.sides.domain.service.UsuarioService;
 import lombok.Getter;
 
-@RestController
+@RestController("Usuario")
 public class UsuarioController {
 
 	@Autowired
@@ -27,27 +29,48 @@ public class UsuarioController {
 	UsuarioDtoConvert usuarioDtoConvert;
 
 	@Autowired
-	CadastroUsuarioService cadastroUsuarioService;
+	UsuarioService usuarioService;
 
 	@PostMapping("/login")
 	public UsuarioDto login(UsuarioJson usuarioJson) {
 
 		Usuario usuario = usuarioJsonConvert.toDomainObject(usuarioJson);
-		usuario = cadastroUsuarioService.localizarUsuarioPorNome(usuario.getNome());
+		usuario = usuarioService.localizarUsuarioPorNome(usuario.getNome());
 		
 		return usuarioDtoConvert.toDto(usuario);
 	}
 
-	@PostMapping()
+	@PostMapping("/novo")
 	@ResponseStatus(HttpStatus.CREATED)
 	public UsuarioDto adicionar(@RequestBody UsuarioJson usuarioJson) {
 		
 		Usuario usuario = usuarioJsonConvert.toDomainObject(usuarioJson);
 
-		usuario = cadastroUsuarioService.salvar(usuario);
+		usuario = usuarioService.salvar(usuario);
 
 		return usuarioDtoConvert.toDto(usuario);
 
+	}
+	
+	@GetMapping("/recuperar/{id}")
+	public UsuarioDto recuperarUsuarioPeloId(@PathVariable("id") Long id) {
+		try {
+			Usuario usuario = usuarioService.localizarUsuarioPorId(id);
+			return usuarioDtoConvert.toDto(usuario);
+		} catch (Exception e) {
+			throw new UsuarioNaoEncontradoException(id);
+		}
+	}
+	
+	@GetMapping("/recuperar/{nome}")
+	public UsuarioDto recuperarUsuarioPeloNome(@PathVariable("nome") String nome) {
+		try {
+			Usuario usuario = usuarioService.localizarUsuarioPorNome(nome);
+			usuarioDtoConvert.toDto(usuario);
+		} catch (Exception e) {
+			throw new UsuarioNaoEncontradoException(null,nome);
+		}
+		return null;
 	}
 	
 	

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.service.CadastroUsuarioService;
+import br.rn.sesed.sides.domain.service.UsuarioService;
 
 @RestController
 @RequestMapping("/")
@@ -17,7 +17,7 @@ public class SidesController {
 	BuildProperties buildProperties;
 	
 	@Autowired 
-	CadastroUsuarioService cadastroUsuarioService;
+	UsuarioService cadastroUsuarioService;
 	
 	
 	@GetMapping("/version")
