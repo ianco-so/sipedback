@@ -7,15 +7,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@DynamicInsert
-@DynamicUpdate
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity(name = "Usuario")
 @Table(name = "usuarios", catalog = "desaparecidos", schema = "dbo")
@@ -26,8 +21,18 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@Column(name = "st_nome")
+	@Column(name="st_nome")
 	private String nome;
 	
+	@Column(name="st_cpf")
+	private String cpf;
 	
+	@Column(name="st_email")
+	private String email;
+	
+	@Column(name="st_telefone")
+	private String telefone;
+	
+	@Column(name="st_senha")
+	private String senha;
 }

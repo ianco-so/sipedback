@@ -30,7 +30,7 @@ public class UsuarioController {
 	CadastroUsuarioService cadastroUsuarioService;
 
 	@PostMapping("/login")
-	public UsuarioDto getLogin(UsuarioJson usuarioJson) {
+	public UsuarioDto login(UsuarioJson usuarioJson) {
 
 		Usuario usuario = usuarioJsonConvert.toDomainObject(usuarioJson);
 		usuario = cadastroUsuarioService.localizarUsuarioPorNome(usuario.getNome());
@@ -49,5 +49,7 @@ public class UsuarioController {
 		return usuarioDtoConvert.toDto(usuario);
 
 	}
+	
+	
 
 }
