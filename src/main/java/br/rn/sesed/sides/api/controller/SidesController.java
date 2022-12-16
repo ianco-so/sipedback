@@ -16,16 +16,19 @@ public class SidesController {
 	@Autowired
 	BuildProperties buildProperties;
 	
-	@Autowired 
+	@Autowired
 	CadastroUsuarioService cadastroUsuarioService;
+
 	
 	
 	@GetMapping("/version")
-	public BuildProperties version() {
+	public Usuario version() {
 		
-//		Usuario usuario = cadastroUsuarioService.localizarUsuario(1L);
+		Usuario usuario = cadastroUsuarioService.localizarUsuario(1L);
 		
-		return buildProperties;
+		return usuario;
+		
+		//return buildProperties;
 	}	
 	
 }

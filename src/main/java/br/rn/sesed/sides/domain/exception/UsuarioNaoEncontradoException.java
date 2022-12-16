@@ -12,4 +12,8 @@ public class UsuarioNaoEncontradoException extends EntidadeNaoEncontradaExceptio
 		super(String.format("Não existe um cadastro de usuário com código %d", usuarioId));
 	}
 
+	public UsuarioNaoEncontradoException(Long id, String usuarioNome) {
+		super(String.format("Não existe um cadastro de usuário com nome %s", usuarioNome));
+	}
+	
 }
