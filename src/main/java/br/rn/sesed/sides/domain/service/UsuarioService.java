@@ -3,7 +3,8 @@ package br.rn.sesed.sides.domain.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuario;
+import br.rn.sesed.sides.domain.exception.ErroAoDeletarUsuarioException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
 import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.repository.UsuarioRepository;
@@ -47,9 +48,19 @@ public class UsuarioService {
 				usuarioRepository.save(usuario);				
 			}
 		}catch (Exception e) {
-			throw new ErroAoSalvarUsuario(usuario.getNome());
+			throw new ErroAoSalvarUsuarioException(usuario.getNome());
 		}
 		return null;
+	}
+	
+	public void deletar(Long id) {
+		try {
+			Usuario user = localizarUsuarioPorId(id);
+			user.setBo_ativo(false);
+			usuarioRepository.save(user);
+		}catch (Exception e) {
+			throw new ErroAoDeletarUsuarioException(id);
+		}
 	}
 
 }

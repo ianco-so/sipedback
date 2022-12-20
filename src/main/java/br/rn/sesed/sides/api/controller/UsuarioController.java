@@ -1,5 +1,7 @@
 package br.rn.sesed.sides.api.controller;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,12 +16,14 @@ import br.rn.sesed.sides.api.model.json.UsuarioJson;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.domain.exception.ErroAoDeletarUsuarioException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
 import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.service.UsuarioService;
+import br.rn.sesed.sides.exception.SidesException;
 import lombok.Getter;
 
-@RestController("Usuario")
+@RestController("/usuario")
 public class UsuarioController {
 
 	@Autowired
@@ -32,14 +36,14 @@ public class UsuarioController {
 	UsuarioService usuarioService;
 
 	@PostMapping("/login")
-	public UsuarioDto login(UsuarioJson usuarioJson) {
+	public UsuarioDto login(UsuarioJson usuarioJson, HttpSession session) {
 
 		Usuario usuario = usuarioJsonConvert.toDomainObject(usuarioJson);
 		usuario = usuarioService.localizarUsuarioPorNome(usuario.getNome());
 		
 		return usuarioDtoConvert.toDto(usuario);
 	}
-
+	
 	@PostMapping("/novo")
 	@ResponseStatus(HttpStatus.CREATED)
 	public UsuarioDto adicionar(@RequestBody UsuarioJson usuarioJson) {
@@ -73,6 +77,14 @@ public class UsuarioController {
 		return null;
 	}
 	
-	
+	@GetMapping("/deletar/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void deletarUsuario(Long id) {
+		try {
+			usuarioService.deletar(id);
+		} catch (Exception e) {
+			throw new ErroAoDeletarUsuarioException(id);
+		}
+	}	
 
 }

@@ -7,6 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,6 +16,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity(name = "Usuario")
 @Table(name = "usuarios", catalog = "desaparecidos", schema = "dbo")
+@DynamicUpdate
 public class Usuario {
 
 	@EqualsAndHashCode.Include
@@ -35,4 +38,7 @@ public class Usuario {
 	
 	@Column(name="st_senha")
 	private String senha;
+	
+	@Column(name="bo_ativo")
+	private Boolean bo_ativo;
 }
