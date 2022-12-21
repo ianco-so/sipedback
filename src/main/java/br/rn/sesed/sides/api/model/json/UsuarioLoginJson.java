@@ -1,13 +1,11 @@
 package br.rn.sesed.sides.api.model.json;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+@Data
 public class UsuarioLoginJson extends UsuarioJson{
 	
-	private String senha;
-	
+	private String cpf;
+	private String senha;	
 	
 }
