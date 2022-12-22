@@ -20,55 +20,51 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.exception.SidesException;
-import br.rn.sesed.sides.infrastructure.authentication.JWTModel.DetalhesUsuarioData;
 
 @Component
 public class JWTAutenticationfilter extends UsernamePasswordAuthenticationFilter {
-	
-	private final Integer EXPIRATION_TIME = 180;
-	public static final String TOKEN_SENHA = "93ae2808505844f694d9fc409526ec05";
-	
-	@Autowired
-	private AuthenticationManager authenticationManager;	
-	
-	@Override
-	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws SidesException  {
-		try {
-			UsuarioLoginJson usuario = new ObjectMapper().readValue(request.getInputStream(), UsuarioLoginJson.class);
-			return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-							usuario.getCpf(), 
-							usuario.getSenha(),
-							new ArrayList<>()));
-		} catch (IOException e) {
-			throw new SidesException("Falha ao autenticar usuario");
-		}
-	}
-	
-	@Override
-	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-			Authentication authResult) throws IOException, ServletException {
-		DetalhesUsuarioData detalhesUsuarioData = (DetalhesUsuarioData) authResult.getPrincipal();
-		Calendar date = Calendar.getInstance();
-		date.add(Calendar.MINUTE, EXPIRATION_TIME);
-		String token = JWT.create()
-				.withSubject(detalhesUsuarioData.getUsername())
-				.withExpiresAt(date.getTime())
-				.sign(Algorithm.HMAC512(TOKEN_SENHA));
-		
-		response.getWriter().write(token);
-		response.getWriter().flush();
-				
-	}
 
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private TokenGenerator generator;
+    
+    public JWTAutenticationfilter(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+        //setFilterProcessesUrl("/api/services/controller/user/login"); 
+    }
+
+    @Override
+    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res) throws AuthenticationException {
+        try {
+        	UsuarioLoginJson creds = new ObjectMapper().readValue(req.getInputStream(), UsuarioLoginJson.class);
+
+            return authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            creds.getCpf(),
+                            creds.getSenha(),
+                            new ArrayList<>())
+            );
+        } catch (IOException e) {
+            throw new SidesException(e.getMessage());
+        }
+    }
+
+    @Override
+    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException {
+    	
+    	String body = ((UsuarioLoginJson) auth.getPrincipal()).getCpf();
+        res.getWriter().write(body);
+        res.getWriter().flush();
+    }
 	
 	
 

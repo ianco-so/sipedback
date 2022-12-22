@@ -1,6 +1,8 @@
 package br.rn.sesed.sides.domain.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.domain.exception.ErroAoDeletarUsuarioException;
@@ -15,6 +17,11 @@ public class UsuarioService {
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	@Bean 
+	public BCryptPasswordEncoder bCryptPasswordEncoder() {
+	    return new BCryptPasswordEncoder(); 
+	}
 	
 	public Usuario localizarUsuario(Long usuarioId) {
 		
@@ -42,15 +49,15 @@ public class UsuarioService {
 		}		
 	}
 
-	public Usuario salvar(Usuario usuario) {
+	public void salvar(Usuario usuario) {
 		try {
 			if (usuario != null) {
+				usuario.setSenha(bCryptPasswordEncoder().encode(usuario.getSenha()));
 				usuarioRepository.save(usuario);				
 			}
 		}catch (Exception e) {
 			throw new ErroAoSalvarUsuarioException(usuario.getNome());
 		}
-		return null;
 	}
 	
 	public void deletar(Long id) {

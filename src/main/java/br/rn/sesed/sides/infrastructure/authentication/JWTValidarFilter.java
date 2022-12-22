@@ -18,37 +18,41 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 
 public class JWTValidarFilter extends BasicAuthenticationFilter {
+	
+	
+	
+	@Autowired
+	private TokenGenerator generator;
+	
+	public JWTValidarFilter(AuthenticationManager authManager) {
+        super(authManager);
+    }
 
-	public static final String HEADER_PARAM = "Authorization";
-	public static final String PARAM_PREFIX = "Bearer ";
-	
-	public JWTValidarFilter(AuthenticationManager authenticationManager) {
-		super(authenticationManager);
-		// TODO Auto-generated constructor stub
-	}
-	
-	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)throws IOException, ServletException {
-		String attr = request.getHeader(HEADER_PARAM);
-		if(attr == null || !attr.startsWith(PARAM_PREFIX)) {
-			chain.doFilter(request, response);
-			return;
-		}
-		String token = attr.replace(PARAM_PREFIX, "");
-		UsernamePasswordAuthenticationToken authenticationToken = getAuthenticationToken(token);
-		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-		chain.doFilter(request, response);
-	}
-	
-	private UsernamePasswordAuthenticationToken getAuthenticationToken(String token) {
-		String usuario = JWT.require(Algorithm.HMAC512(JWTAutenticationfilter.TOKEN_SENHA))
-				.build()
-				.verify(token)
-				.getSubject();
-		if (usuario == null) {
-			return null;
-		}
-		return new UsernamePasswordAuthenticationToken(usuario, null, new ArrayList<>());
-	}
-	
+    @Override
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
+        String header = req.getHeader(this.generator.HEADER_STRING);
+        
+        if (header == null || !header.startsWith(this.generator.TOKEN_PREFIX)) {
+            chain.doFilter(req, res);
+            return;
+        }
+        UsernamePasswordAuthenticationToken authentication = getAuthentication(req);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        chain.doFilter(req, res);
+    }
+
+    // Reads the JWT from the Authorization header, and then uses JWT to validate the token
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+        String token = request.getHeader(this.generator.HEADER_STRING);
+
+        if (token != null) {
+        	String user = generator.decodificarToken(token);
+            if (user != null) {
+                // Substituir Array pelas permissões
+                return new UsernamePasswordAuthenticationToken(user, null, new ArrayList<>());
+            }
+            return null;
+        }
+        return null;
+    }
 }
