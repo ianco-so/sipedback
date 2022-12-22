@@ -35,6 +35,7 @@ import br.rn.sesed.sides.infrastructure.authentication.JWTModel.DetalhesUsuarioD
 public class JWTAutenticationfilter extends UsernamePasswordAuthenticationFilter {
 	
 	private final Integer EXPIRATION_TIME = 180;
+	public static final String TOKEN_SENHA = "93ae2808505844f694d9fc409526ec05";
 	
 	@Autowired
 	private AuthenticationManager authenticationManager;	
@@ -51,6 +52,7 @@ public class JWTAutenticationfilter extends UsernamePasswordAuthenticationFilter
 			throw new SidesException("Falha ao autenticar usuario");
 		}
 	}
+	
 	@Override
 	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
 			Authentication authResult) throws IOException, ServletException {
@@ -60,17 +62,14 @@ public class JWTAutenticationfilter extends UsernamePasswordAuthenticationFilter
 		String token = JWT.create()
 				.withSubject(detalhesUsuarioData.getUsername())
 				.withExpiresAt(date.getTime())
-				.sign(Algorithm.HMAC512(getPrivateKey()));
+				.sign(Algorithm.HMAC512(TOKEN_SENHA));
 		
 		response.getWriter().write(token);
 		response.getWriter().flush();
 				
 	}
 
-	private String getPrivateKey()  {
-		// Senha para a assinatura do token
-		return "93ae2808505844f694d9fc409526ec05";
-    }
+	
 	
 
 }
