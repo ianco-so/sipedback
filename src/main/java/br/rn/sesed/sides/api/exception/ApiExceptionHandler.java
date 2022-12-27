@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -25,6 +26,20 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		HttpStatus status = HttpStatus.NOT_FOUND;
 		ErroExceptionType erroExceptionType = ErroExceptionType.RECURSO_NAO_ENCONTRADO;
+		String detail = ex.getMessage();
+		
+		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)
+				.userMessage(detail)
+				.build();
+		
+		return handleExceptionInternal(ex, erroException, new HttpHeaders(), status, request);
+	}
+	
+	@ExceptionHandler(ErroAoSalvarUsuarioException.class)
+	public ResponseEntity<?> handleErroAoSalvarUsuarioException(ErroAoSalvarUsuarioException ex,	WebRequest request) {
+		
+		HttpStatus status = HttpStatus.NOT_MODIFIED;
+		ErroExceptionType erroExceptionType = ErroExceptionType.ENTRADA_DUPLICADA;
 		String detail = ex.getMessage();
 		
 		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)

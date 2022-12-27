@@ -9,13 +9,15 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
 
+
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity(name = "Usuario")
-@Table(name = "usuarios", catalog = "desaparecidos", schema = "dbo")
+@Table(name = "usuarios", catalog = "desaparecidos2", schema = "dbo")
 @DynamicUpdate
 public class Usuario {
 
@@ -30,15 +32,28 @@ public class Usuario {
 	@Column(name="st_cpf")
 	private String cpf;
 	
+	@Column(name="st_fone_contato")
+	private String telefone;
+	
 	@Column(name="st_email")
 	private String email;
-	
-	@Column(name="st_telefone")
-	private String telefone;
 	
 	@Column(name="st_senha")
 	private String senha;
 	
-	@Column(name="bo_ativo")
-	private Boolean bo_ativo;
+	@Column(name="dt_cadastro")
+	private String cadastro;
+	
+	@Column(name="st_tipo")
+	private String tipo;
+	
+	@Column(name="st_revalida")
+	private String tokenFcm;
+	
+	@Column(name="bo_token_enable")
+	private Boolean tokenEnable;
+	
+	@Column(name="bo_senha_reset")
+	private Boolean senhaReset;
+	
 }

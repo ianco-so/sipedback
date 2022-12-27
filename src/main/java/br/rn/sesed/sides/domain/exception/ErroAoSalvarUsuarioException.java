@@ -7,8 +7,12 @@ public class ErroAoSalvarUsuarioException extends SidesException {
 
 	private static final long serialVersionUID = 1L;
 
-	public ErroAoSalvarUsuarioException(String message) {
-		super(String.format("Não foi possível salvar o usuario %s", message));
+	public ErroAoSalvarUsuarioException() {
+		super("Não foi possível salvar o usuario");
+	}
+	
+	public ErroAoSalvarUsuarioException(String motivo) {
+		super(String.format("Não foi possível salvar o usuario: %s", motivo));
 	}
 	
 }

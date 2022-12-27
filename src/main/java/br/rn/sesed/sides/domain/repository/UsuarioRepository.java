@@ -9,11 +9,12 @@ import br.rn.sesed.sides.domain.model.Usuario;
 @Repository
 public interface UsuarioRepository extends CustomJpaRepository<Usuario, Long> {
 	
-	public Optional<Usuario> findById(String nome);
-
-	public Optional<Usuario> findByNome(String nome);
-	
 	public Optional<Usuario> findByCpf(String cpf);
 	
+	public Optional<Usuario> findById(Long id);
+	
+	public Optional<Usuario> findByNome(String nome);
+	
+	public Optional<Usuario> findByCpfOrEmail(String cpf, String email);
 	
 }
