@@ -59,7 +59,7 @@ public class UsuarioController {
 			usuarioService.salvar(usuario);
 			return usuarioDtoConvert.toDto(usuario);
 		} catch (Exception e) {
-			throw new ErroAoSalvarUsuarioException();
+			throw new ErroAoSalvarUsuarioException(e.getMessage());
 		}
 	}
 	
