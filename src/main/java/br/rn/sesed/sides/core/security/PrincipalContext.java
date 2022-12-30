@@ -2,46 +2,27 @@ package br.rn.sesed.sides.core.security;
 
 import java.security.Principal;
 
+import lombok.Data;
+
+@Data
 public class PrincipalContext implements Principal{
 
-	private String name;
-	private String nameFull;
-	private String email;
+	private String cpf;
+	private String senha;
+	private String nome;
+
 	
-	
-	
-	public PrincipalContext(String name, String nameFull, String email) {
+	public PrincipalContext(String cpf, String senha, String nome) {
 		super();
-		this.name = name;
-		this.nameFull = nameFull;
-		this.email = email;
+		this.cpf = cpf;
+		this.senha = senha;
+		this.nome = nome;
 	}
 
 	@Override
 	public String getName() {
-		return name;
-	}
-
-	public String getNameFull() {
-		return nameFull;
-	}
-
-	public void setNameFull(String nameFull) {
-		this.nameFull = nameFull;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setName(String name) {
-		this.name = name;
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
-	
-
 }

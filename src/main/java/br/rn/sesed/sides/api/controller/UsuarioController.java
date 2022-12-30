@@ -1,9 +1,10 @@
 package br.rn.sesed.sides.api.controller;
 
 
-import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.SecurityContext;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.rn.sesed.sides.api.model.dto.UsuarioDto;
 import br.rn.sesed.sides.api.model.json.UsuarioJson;
+import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.core.security.Security;
 import br.rn.sesed.sides.domain.exception.ErroAoDeletarUsuarioException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
@@ -32,25 +35,25 @@ public class UsuarioController {
 	private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
 	
 	@Autowired
-	UsuarioJsonConvert usuarioJsonConvert;
+	private UsuarioJsonConvert usuarioJsonConvert;
 
 	@Autowired
-	UsuarioDtoConvert usuarioDtoConvert;
+	private UsuarioDtoConvert usuarioDtoConvert;
 
 	@Autowired
-	UsuarioService usuarioService;
+	private UsuarioService usuarioService;
+	
 
 	@PostMapping("/usuario/login")
-	public UsuarioDto login(UsuarioJson usuarioJson, HttpSession session) {
+	public @ResponseBody UsuarioDto login(@RequestBody UsuarioLoginJson usuarioJson) {
 		try {
-			Usuario usuario = usuarioJsonConvert.toDomainObject(usuarioJson);
-			usuario = usuarioService.localizarUsuarioPorNome(usuario.getNome());
-			return usuarioDtoConvert.toDto(usuario);
+			return usuarioService.autenticarUsuario(usuarioJson);
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 	
+	@Security
 	@PostMapping("/usuario/novo")
 	@ResponseStatus(HttpStatus.CREATED)
 	public @ResponseBody UsuarioDto adicionar(@RequestBody UsuarioJson usuarioJson) {
@@ -63,8 +66,9 @@ public class UsuarioController {
 		}
 	}
 	
+	@Security
 	@GetMapping("/usuario/recuperar/id/{id}")
-	public @ResponseBody UsuarioDto recuperarUsuarioPeloId(@PathVariable("id") Long id) {
+	public @ResponseBody UsuarioDto recuperarUsuarioPeloId(@PathVariable("id") Long id, @Context HttpServletRequest request, @Context SecurityContext secContext) {
 		try {
 			Usuario usuario = usuarioService.localizarUsuarioPorId(id);
 			return usuarioDtoConvert.toDto(usuario);
@@ -73,16 +77,18 @@ public class UsuarioController {
 		}
 	}
 	
+	@Security
 	@GetMapping("/usuario/recuperar/nome/{nome}")
 	public UsuarioDto recuperarUsuarioPeloNome(@PathVariable("nome") String nome) {
 		try {
 			Usuario usuario = usuarioService.localizarUsuarioPorNome(nome);
 			return usuarioDtoConvert.toDto(usuario);
 		} catch (Exception e) {
-			throw new UsuarioNaoEncontradoException(null,nome);
+			throw new UsuarioNaoEncontradoException("nome",nome);
 		}
 	}
 	
+	@Security
 	@GetMapping("/usuario/deletar/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public void deletarUsuario(Long id) {

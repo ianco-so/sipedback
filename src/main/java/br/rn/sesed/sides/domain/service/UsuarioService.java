@@ -1,17 +1,18 @@
 package br.rn.sesed.sides.domain.service;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Optional;
 
-import org.hibernate.exception.ConstraintViolationException;
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import br.rn.sesed.sides.api.model.dto.UsuarioDto;
+import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
+import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
+import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.core.security.GenerateToken;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
-import br.rn.sesed.sides.domain.exception.UsuarioInvalidoException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
 import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.repository.UsuarioRepository;
@@ -19,9 +20,35 @@ import br.rn.sesed.sides.exception.SidesException;
 
 @Service
 public class UsuarioService {
+
+	@Autowired
+	private UsuarioJsonConvert usuarioJsonConvert;
+	
+	@Autowired
+	private UsuarioDtoConvert usuarioDtoConvert;
+	
+	@Autowired
+	private GenerateToken generateToken;
+	
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	public UsuarioDto autenticarUsuario(UsuarioLoginJson usuarioJson) {
+		try {
+			usuarioJson.setCpf(usuarioJson.getCpf().replace(".", "").replace("-", ""));
+			Optional<Usuario> usuario = usuarioRepository.findByCpf(usuarioJson.getCpf());
+			if (usuario.isPresent()) {
+				UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
+				resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(),usuario.get().getCpf() , usuario.get().getEmail()));
+				return resultDto;
+			}else {
+				throw new UsuarioNaoEncontradoException("", usuarioJson.getCpf());
+			}
+		} catch (Exception e) {
+			throw new SidesException(e.getMessage());
+		}
+	}
 		
 	
 	public Usuario localizarUsuarioPorNome(String usuarioNome) {
@@ -32,7 +59,7 @@ public class UsuarioService {
 				throw new SidesException("Nome de usuario não pode ser nulo ou vazio");
 			}
 		}catch (Exception e) {
-			throw new UsuarioNaoEncontradoException(null,usuarioNome);
+			throw new UsuarioNaoEncontradoException(1L,usuarioNome);
 		}
 	}	
 	

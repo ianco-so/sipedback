@@ -4,26 +4,29 @@ import java.security.Principal;
 
 import javax.ws.rs.core.SecurityContext;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class SecuryContext implements SecurityContext{
 
-	private String name;
-	private String nameFull;
-	private String email;
-	
-	
+	private String cpf;
+	private String senha;
+	private String nome;
 	
 	public SecuryContext() {
 		super();
 	}
 
-	public SecuryContext(String name, String nameFull, String email) {
+	public SecuryContext(String cpf, String senha, String nome) {
 		super();
-		this.name = name;
-		this.nameFull = nameFull;
-		this.email = email;
+		this.cpf = cpf;
+		this.senha = senha;
+		this.nome = nome;
 	}
-
-
 
 	@Override
 	public String getAuthenticationScheme() {
@@ -32,7 +35,7 @@ public class SecuryContext implements SecurityContext{
 
 	@Override
 	public Principal getUserPrincipal() {
-		PrincipalContext rotafxPrincipal = new PrincipalContext(name, nameFull, email);
+		PrincipalContext rotafxPrincipal = new PrincipalContext(cpf, senha, nome);
 		return rotafxPrincipal;
 	}
 
@@ -46,31 +49,5 @@ public class SecuryContext implements SecurityContext{
 		// TODO Auto-generated method stub
 		return false;
 	}
-
-
-
-	public String getNameFull() {
-		return nameFull;
-	}
-
-
-
-	public void setNameFull(String nameFull) {
-		this.nameFull = nameFull;
-	}
-
-
-
-	public String getEmail() {
-		return email;
-	}
-
-
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-	
-	
 
 }

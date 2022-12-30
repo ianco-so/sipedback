@@ -12,6 +12,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import io.jsonwebtoken.Claims;
 
 
@@ -24,7 +26,7 @@ import io.jsonwebtoken.Claims;
 @Priority(Priorities.AUTHENTICATION)
 public class FiltroAutenticacao implements ContainerRequestFilter {
 	
-	@Inject
+	@Autowired
 	private GenerateToken generateToken;
 	
 //	@Inject
@@ -73,11 +75,11 @@ public class FiltroAutenticacao implements ContainerRequestFilter {
 
 	// Método que modifica o SecurityContext
 
-	private void modificarRequestContext(ContainerRequestContext requestContext, String login, String name, String email) {
+	private void modificarRequestContext(ContainerRequestContext requestContext, String cpf, String senha, String nome) {
 		
 		//final SecurityContext currentSecurityContext = requestContext.getSecurityContext();
 		
-		SecuryContext rotafxSecuryContext = new SecuryContext(login,name,email);
+		SecuryContext rotafxSecuryContext = new SecuryContext(cpf, senha, nome);
 		
 		requestContext.setSecurityContext(rotafxSecuryContext);
 

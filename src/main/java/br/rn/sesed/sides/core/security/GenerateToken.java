@@ -19,18 +19,20 @@ import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.stereotype.Component;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 
-@Stateless(name = "GenerateToken")
+//@Stateless(name = "GenerateToken")
+@Component
 public class GenerateToken {
 	
 	private static final Log logger = LogFactory.getLog(GenerateToken.class);
 	private static final String CHAVE_REVALIDA = "f6622e29a37c586bbde48be9d81dea52fa30340386602959491c97d69fe906c8";
-	private static final Integer VALIDADE_MINUTES = 1440; 
+	private static final Integer VALIDADE_MINUTES = 60; 
 	
 	public GenerateToken() {
 	}
@@ -89,14 +91,14 @@ public class GenerateToken {
     }	
 	
 	
-    public String gerarToken(String login, String cpf, String nome, String email) throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public String gerarToken(String nome, String cpf, String email) throws InvalidKeySpecException, NoSuchAlgorithmException {
 
     	// Data atual que data que o token foi gerado
     	Date agora = new Date();
     	
     	if(nome == null || nome.isEmpty()) {nome="";}
-    	if(email == null || email.isEmpty()) {email="";}
     	if(cpf == null || cpf.isEmpty()) {cpf="";}
+    	if(email == null || email.isEmpty()) {email="";}
     	
 //		Define até que data o token é pelo quantidade de dias que foi passo pelo
 //		parâmetro expiraEmDias
@@ -109,12 +111,11 @@ public class GenerateToken {
 
         Instant now = Instant.now();
         String jwtToken = Jwts.builder()
-                .claim("name", nome)
                 .claim("cpf", cpf)
                 .claim("email", email)
                 .setId(UUID.randomUUID().toString())
                 .setIssuedAt(agora)
-                .setIssuer(login)
+                .setIssuer(nome)
                 .setExpiration(expira.getTime())
                 .signWith(privateKey)
                 .compact();

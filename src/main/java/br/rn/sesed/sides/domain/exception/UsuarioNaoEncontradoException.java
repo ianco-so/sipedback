@@ -16,4 +16,8 @@ public class UsuarioNaoEncontradoException extends EntidadeNaoEncontradaExceptio
 		super(String.format("Não existe um cadastro de usuário com nome %s", usuarioNome));
 	}
 	
+	public UsuarioNaoEncontradoException(String str, String cpf) {
+		super(String.format("Não existe um cadastro de usuário com o CPF %s", cpf));
+	}
+	
 }
