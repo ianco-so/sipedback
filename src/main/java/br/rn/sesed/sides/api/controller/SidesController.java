@@ -19,6 +19,10 @@ public class SidesController {
 	@Autowired 
 	UsuarioService cadastroUsuarioService;
 	
+//	@GetMapping("/")
+//	public String login() {
+//		return "";
+//	}	
 	
 	@GetMapping("/version")
 	public BuildProperties version() {

@@ -9,15 +9,13 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
 
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NonNull;
 
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity(name = "Usuario")
-@Table(name = "usuarios", catalog = "desaparecidos2", schema = "dbo")
+@Table(name = "usuarios", schema = "dbo")
 @DynamicUpdate
 public class Usuario {
 

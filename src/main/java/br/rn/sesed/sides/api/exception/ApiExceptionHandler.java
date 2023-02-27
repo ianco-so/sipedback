@@ -15,6 +15,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 
 @ControllerAdvice
@@ -36,10 +37,24 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	}
 	
 	@ExceptionHandler(ErroAoSalvarUsuarioException.class)
-	public ResponseEntity<?> handleErroAoSalvarUsuarioException(ErroAoSalvarUsuarioException ex,	WebRequest request) {
+	public ResponseEntity<?> handleErroAoSalvarUsuario(ErroAoSalvarUsuarioException ex,	WebRequest request) {
 		
-		HttpStatus status = HttpStatus.NOT_MODIFIED;
+		HttpStatus status = HttpStatus.FORBIDDEN;
 		ErroExceptionType erroExceptionType = ErroExceptionType.ENTRADA_DUPLICADA;
+		String detail = ex.getMessage();
+		
+		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)
+				.userMessage(detail)
+				.build();
+		
+		return handleExceptionInternal(ex, erroException, new HttpHeaders(), status, request);
+	}
+	
+	@ExceptionHandler(ErroAoSalvarRegistroException.class)
+	public ResponseEntity<?> handleErroAoSalvarRegistro(ErroAoSalvarRegistroException ex,	WebRequest request) {
+		
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		ErroExceptionType erroExceptionType = ErroExceptionType.DADOS_INVALIDOS;
 		String detail = ex.getMessage();
 		
 		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)

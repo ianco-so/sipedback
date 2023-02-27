@@ -16,5 +16,7 @@ public interface UsuarioRepository extends CustomJpaRepository<Usuario, Long> {
 	public Optional<Usuario> findByNome(String nome);
 	
 	public Optional<Usuario> findByCpfOrEmail(String cpf, String email);
+
+	public Optional<Usuario> findByCpfAndSenha(String cpf, String senha);
 	
 }
