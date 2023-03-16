@@ -92,6 +92,8 @@ public class PessoaDto {
 
 	private String intelectual;
 
+	private Boolean boDeficienciaFisica;
+	
 	private String fisica;
 
 	private Boolean boCadeirante;

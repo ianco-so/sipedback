@@ -158,6 +158,9 @@ public class Pessoa {
 	@Column(name = "st_intelectual")
 	private String intelectual;
 
+	@Column(name = "bo_deficienciafisica")
+	private Boolean boDeficienciaFisica;
+	
 	@Column(name = "st_fisica")
 	private String fisica;
 
