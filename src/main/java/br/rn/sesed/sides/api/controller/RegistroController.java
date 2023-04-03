@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
+import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
@@ -29,6 +30,7 @@ import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
 import br.rn.sesed.sides.domain.model.Usuario;
+import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
 import br.rn.sesed.sides.domain.service.UsuarioService;
 
@@ -38,7 +40,9 @@ public class RegistroController {
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistroController.class);
 
-
+	@Autowired
+	private PessoaService pessoaService;
+	
 	@Autowired
 	private PessoaJsonConvert pessoaJsonConvert;
 
@@ -117,6 +121,16 @@ public class RegistroController {
 			return registroDtoConvert.toCollectionModel(registros);
 		} catch (Exception e) {
 			throw new ErroAoSalvarUsuarioException(e.getMessage());
+		}
+	}
+	
+	@PostMapping("/vincular")
+	@ResponseStatus(HttpStatus.OK)
+	public void vincular(@RequestBody VincularDto vincularDto) throws Exception {
+		try {
+			pessoaService.vincularRegistroPessoa(vincularDto.getIdp(),vincularDto.getIdr());
+		} catch (Exception e) {
+			throw e;
 		}
 	}
 

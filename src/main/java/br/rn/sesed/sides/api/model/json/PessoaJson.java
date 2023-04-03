@@ -2,8 +2,6 @@ package br.rn.sesed.sides.api.model.json;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-
 import lombok.Data;
 
 @Data
@@ -91,6 +89,8 @@ public class PessoaJson {
 
 	private String intelectual;
 
+	private String boFisica;
+	
 	private String fisica;
 
 	private Boolean boCadeirante;
@@ -132,4 +132,8 @@ public class PessoaJson {
 	private String marcas;
 
 	private String fotoPrincipal;
+	
+	private String segundaFoto;
+	
+	private String terceiraFoto;
 }

@@ -12,8 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -157,9 +155,12 @@ public class Pessoa {
 
 	@Column(name = "st_intelectual")
 	private String intelectual;
-
+/*
 	@Column(name = "bo_deficienciafisica")
 	private Boolean boDeficienciaFisica;
+*/
+	@Column(name = "bo_fisica")
+	private Boolean bofisica;
 	
 	@Column(name = "st_fisica")
 	private String fisica;
@@ -224,6 +225,12 @@ public class Pessoa {
 
 	@Column(name = "st_fotoprincipal")
 	private String fotoPrincipal;
+	
+	@Column(name = "st_segundafoto")
+	private String segundaFoto;
+	
+	@Column(name = "st_terceirafoto")
+	private String terceiraFoto;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "registro_pessoa", joinColumns = @JoinColumn(name = "ce_pessoa"), inverseJoinColumns = @JoinColumn(name = "ce_registro"))

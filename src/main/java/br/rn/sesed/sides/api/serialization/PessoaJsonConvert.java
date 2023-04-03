@@ -23,4 +23,8 @@ public class PessoaJsonConvert {
 		modelMapper.map(usuarioJson, usuario);
 	}
 	
+	public PessoaJson toPessoaJson(Pessoa pessoa) {
+		return modelMapper.map(pessoa, PessoaJson.class);
+	}
+	
 }
