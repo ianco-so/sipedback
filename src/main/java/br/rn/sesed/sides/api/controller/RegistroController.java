@@ -37,6 +37,8 @@ import br.rn.sesed.sides.domain.service.UsuarioService;
 @RestController
 @RequestMapping("/registro")
 public class RegistroController {
+	
+	//test
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistroController.class);
 
