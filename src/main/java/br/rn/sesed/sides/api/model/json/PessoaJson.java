@@ -89,7 +89,7 @@ public class PessoaJson {
 
 	private String intelectual;
 
-	private String boFisica;
+	private Boolean boFisica;
 	
 	private String fisica;
 
