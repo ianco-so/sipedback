@@ -7,8 +7,6 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
-import br.rn.sesed.sides.core.security.GenerateToken;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
@@ -81,6 +79,7 @@ public class RegistroService {
 			registro.getPessoas().add(pessoa);
 			registroRepository.save(registro);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw e;
 		}
 	}
