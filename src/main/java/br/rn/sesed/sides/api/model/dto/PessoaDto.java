@@ -1,7 +1,6 @@
 package br.rn.sesed.sides.api.model.dto;
 
 import java.util.Date;
-import java.util.List;
 
 import lombok.Data;
 
@@ -94,6 +93,8 @@ public class PessoaDto {
 
 	private Boolean boDeficienciaFisica;
 	
+	private Boolean boFisica;
+	
 	private String fisica;
 
 	private Boolean boCadeirante;
@@ -111,6 +112,8 @@ public class PessoaDto {
 	private String memoria;
 
 	private Boolean boComorbidade;
+	
+	private String comorbidade;
 
 	private Boolean boInteracaosocial;
 
@@ -133,6 +136,10 @@ public class PessoaDto {
 	private String marcas;
 
 	private String fotoPrincipal;
+	
+	private String segundaFoto;
+	
+	private String terceiraFoto;
 
 //	List<RegistroDto> registros;
 	
