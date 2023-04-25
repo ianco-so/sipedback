@@ -160,6 +160,13 @@
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.1</version>
 		</dependency>
+		
+		<!-- https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-ftp -->
+		<dependency>
+		    <groupId>org.springframework.integration</groupId>
+		    <artifactId>spring-integration-ftp</artifactId>
+		</dependency>
+			
 	</dependencies>
 
 
