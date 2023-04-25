@@ -3,15 +3,19 @@ package br.rn.sesed.sides.api.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MediaType;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +24,7 @@ import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
-import br.rn.sesed.sides.api.model.json.RegistroJson;
+import br.rn.sesed.sides.api.model.json.RegistroMultiPartJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
@@ -37,8 +41,6 @@ import br.rn.sesed.sides.domain.service.UsuarioService;
 @RestController
 @RequestMapping("/registro")
 public class RegistroController {
-	
-	//test
 
 	private static final Logger logger = LoggerFactory.getLogger(RegistroController.class);
 
@@ -60,25 +62,25 @@ public class RegistroController {
 	@Autowired
 	private RegistroService registroService;
 
-	@PostMapping("/novo")
 	@ResponseStatus(HttpStatus.CREATED)
-	public @ResponseBody void adicionar(@RequestBody RegistroJson registroJson) {
+	@RequestMapping(consumes = { MediaType.MULTIPART_FORM_DATA }, path = "/novo", method = RequestMethod.POST)
+	public @ResponseBody void adicionar(@ModelAttribute RegistroMultiPartJson registroJson) {
 		try {
-
-			Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.cpfUsuario);
-
-			Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.pessoa);
-
-			Registro registro = registroJsonConvert.toDomainObject(registroJson);
-
-			registro.setUsuario(usuario);
-			registro.setPessoas(new ArrayList<>());
-			registro.getPessoas().add(pessoa);
-
-			registroService.salvar(registro);
-
-		} catch (Exception e) {
-			throw new ErroAoSalvarRegistroException(e.getMessage());
+			
+				Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getRegistro().cpfUsuario);
+	
+				Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getRegistro().pessoa);
+	
+				Registro registro = registroJsonConvert.toDomainObject(registroJson.getRegistro());
+	
+				registro.setUsuario(usuario);
+				registro.setPessoas(new ArrayList<>());
+				registro.getPessoas().add(pessoa);
+	
+				registroService.salvar(registro);
+	
+			} catch (Exception e) {
+				throw new ErroAoSalvarRegistroException(e.getMessage());
 		}
 	}
 
