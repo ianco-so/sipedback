@@ -16,19 +16,6 @@ import lombok.extern.log4j.Log4j2;
 class FtpTemplateConfiguration {
 
 	@Bean
-	InitializingBean initializingBean(FtpRemoteFileTemplate template) {
-		return () -> template
-			.execute(session -> {
-				var file = new File(new File(System.getProperty("user.home"), "Desktop"), "hello-local.txt");
-				try (var fout = new FileOutputStream(file)) {
-					session.read("hello.txt", fout);
-				}
-				log.info("read " + file.getAbsolutePath());
-				return null;
-			});
-	}
-
-	@Bean
 	DefaultFtpSessionFactory defaultFtpSessionFactory() {
 		DefaultFtpSessionFactory defaultFtpSessionFactory = new DefaultFtpSessionFactory();
 		defaultFtpSessionFactory.setPassword("ffM?YZU[1J");
@@ -42,4 +29,19 @@ class FtpTemplateConfiguration {
 	FtpRemoteFileTemplate ftpRemoteFileTemplate(DefaultFtpSessionFactory dsf) {
 		return new FtpRemoteFileTemplate(dsf);
 	}
+	
+
+	@Bean
+	InitializingBean initializingBean(FtpRemoteFileTemplate template) {
+		return () -> template
+			.execute(session -> {
+				var file = new File(new File(System.getProperty("user.home"), "Desktop"), "hello-local.txt");
+				try (var fout = new FileOutputStream(file)) {
+					session.read("hello.txt", fout);
+				}
+				log.info("read " + file.getAbsolutePath());
+				return null;
+			});
+	}
+
 }

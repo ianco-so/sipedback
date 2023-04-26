@@ -5,10 +5,12 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.integration.ftp.session.FtpRemoteFileTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,7 +63,28 @@ public class RegistroController {
 
 	@Autowired
 	private RegistroService registroService;
-
+	
+	@Autowired
+	private FtpRemoteFileTemplate frt;
+	
+	
+	@GetMapping("/imagem")
+	public @ResponseBody List<String> getImages(){
+		try {
+			List<String> result=  new ArrayList<>();
+			FTPFile[] aa = frt.list("/");
+			for (FTPFile ftpFile : aa) {
+				result.add(ftpFile.getName());				
+			}
+			return result;
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+			logger.error("Erro: "+ e.getMessage());
+			throw e;
+		}
+	}
+	
 	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(consumes = { MediaType.MULTIPART_FORM_DATA }, path = "/novo", method = RequestMethod.POST)
 	public @ResponseBody void adicionar(@ModelAttribute RegistroMultiPartJson registroJson) {
