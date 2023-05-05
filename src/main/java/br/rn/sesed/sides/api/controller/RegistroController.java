@@ -5,12 +5,10 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
-import org.apache.commons.net.ftp.FTPFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.integration.ftp.session.FtpRemoteFileTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,6 +35,7 @@ import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
 import br.rn.sesed.sides.domain.model.Usuario;
+import br.rn.sesed.sides.domain.service.FtpService;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
 import br.rn.sesed.sides.domain.service.UsuarioService;
@@ -65,26 +65,21 @@ public class RegistroController {
 	private RegistroService registroService;
 	
 	@Autowired
-	private FtpRemoteFileTemplate frt;
+	private FtpService fptFtpService;
 	
 	
-	@GetMapping("/imagem")
-	public @ResponseBody List<String> getImages(){
+	//@RequestMapping( method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA })
+	@PostMapping
+	public void testFtp(@RequestParam RegistroMultiPartJson multiPartJson) throws Exception {
 		try {
-			List<String> result=  new ArrayList<>();
-			FTPFile[] aa = frt.list("/");
-			for (FTPFile ftpFile : aa) {
-				result.add(ftpFile.getName());				
-			}
-			return result;
+			logger.debug(multiPartJson.getFotoPrincipal().getOriginalFilename());
+			//fptFtpService.upload("/home/desaparecidos/2023", reg);
 			
 		} catch (Exception e) {
-			e.printStackTrace();
-			logger.error("Erro: "+ e.getMessage());
 			throw e;
 		}
 	}
-	
+
 	@ResponseStatus(HttpStatus.CREATED)
 	@RequestMapping(consumes = { MediaType.MULTIPART_FORM_DATA }, path = "/novo", method = RequestMethod.POST)
 	public @ResponseBody void adicionar(@ModelAttribute RegistroMultiPartJson registroJson) {

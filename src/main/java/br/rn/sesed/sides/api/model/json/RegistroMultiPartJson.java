@@ -11,4 +11,5 @@ public class RegistroMultiPartJson {
 	private MultipartFile fotoPrincipal;
 	private MultipartFile segundaFoto;
 	private MultipartFile terceiraFoto;
+	
 }

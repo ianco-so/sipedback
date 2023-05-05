@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.7.0</version>
+		<version>2.7.11</version>
 		<relativePath />
 	</parent>
 
@@ -159,17 +159,14 @@
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-jackson</artifactId>
 			<version>0.11.1</version>
-		</dependency>
-		
-		<!-- https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-ftp -->
+		</dependency>		
+		<!-- https://mvnrepository.com/artifact/commons-net/commons-net -->
 		<dependency>
-		    <groupId>org.springframework.integration</groupId>
-		    <artifactId>spring-integration-ftp</artifactId>
-		</dependency>
-			
+		    <groupId>commons-net</groupId>
+		    <artifactId>commons-net</artifactId>
+		    <version>3.9.0</version>
+		</dependency>		
 	</dependencies>
-
-
 	<build>
 		<plugins>
 			<plugin>

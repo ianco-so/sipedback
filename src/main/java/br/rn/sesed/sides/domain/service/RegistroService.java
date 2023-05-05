@@ -77,7 +77,7 @@ public class RegistroService {
 			Pessoa pessoa = pessoaService.salvar(registro.getPessoas().get(0));
 			registro.getPessoas().clear();
 			registro.getPessoas().add(pessoa);
-			registroRepository.save(registro);
+			Registro reg = registroRepository.save(registro);
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
