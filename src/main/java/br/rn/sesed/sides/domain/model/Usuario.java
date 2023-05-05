@@ -54,4 +54,9 @@ public class Usuario {
 	@Column(name="bo_senha_reset")
 	private Boolean senhaReset;
 	
+	@Column(name = "bo_validado")
+	private Boolean boValidado;
+	
+	@Column(name = "st_instituicao")
+	private String instituicao;
 }
