@@ -34,7 +34,7 @@ import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
-import br.rn.sesed.sides.domain.service.FtpService;
+import br.rn.sesed.sides.domain.service.FTPService;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
 import br.rn.sesed.sides.domain.service.UsuarioService;
@@ -64,7 +64,7 @@ public class RegistroController {
 	private RegistroService registroService;
 	
 	@Autowired
-	private FtpService ftpService;
+	private FTPService ftpService;
 		
 	@RequestMapping( method = RequestMethod.POST,path = "/novo", consumes = { MediaType.MULTIPART_FORM_DATA })
 	@ResponseStatus(code = HttpStatus.CREATED)
@@ -76,7 +76,7 @@ public class RegistroController {
 			fotos.forEach((str, foto) -> {
 					try {
 						InputStream is = foto.getInputStream();
-						boolean result =  ftpService.upload("./2023/" + foto.getOriginalFilename() , is);
+						boolean result =  ftpService.uploadFile("./2023/" + foto.getOriginalFilename() , is);
 					}  catch (Exception e) {
 						return;
 					}				

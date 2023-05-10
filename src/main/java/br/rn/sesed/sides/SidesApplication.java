@@ -10,7 +10,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
+@SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class}, scanBasePackages = "br.rn.sesed.sides")
 public class SidesApplication  extends SpringBootServletInitializer {
 	
 	

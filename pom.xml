@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>br.rn.sesed.sides</groupId>
-	<artifactId>Sides</artifactId>
+	<artifactId>sides</artifactId>
 	<version>1.0.3</version>
 	<packaging>war</packaging>
 	<name>Api do Sistema de Desaparecidos - Sides</name>
