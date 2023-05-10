@@ -1,7 +1,9 @@
 package br.rn.sesed.sides.api.controller;
 
-import java.util.ArrayList;
+
+import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,21 +21,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
-import br.rn.sesed.sides.api.model.json.RegistroMultiPartJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
-import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
-import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.service.FtpService;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
@@ -65,42 +64,55 @@ public class RegistroController {
 	private RegistroService registroService;
 	
 	@Autowired
-	private FtpService fptFtpService;
-	
-	
-	//@RequestMapping( method = RequestMethod.POST, consumes = { MediaType.MULTIPART_FORM_DATA })
-	@PostMapping
-	public void testFtp(@RequestParam RegistroMultiPartJson multiPartJson) throws Exception {
-		try {
-			logger.debug(multiPartJson.getFotoPrincipal().getOriginalFilename());
-			//fptFtpService.upload("/home/desaparecidos/2023", reg);
+	private FtpService ftpService;
+		
+	@RequestMapping( method = RequestMethod.POST,path = "/novo", consumes = { MediaType.MULTIPART_FORM_DATA })
+	@ResponseStatus(code = HttpStatus.CREATED)
+	public void testFtp(@RequestParam Map<String,MultipartFile> fotos, @RequestParam(name = "registro", required = false) String registro)throws Exception {
+		
+			//Calendar calendar = Calendar.getInstance();
+			//String ano = String.valueOf(Calendar.YEAR);
 			
-		} catch (Exception e) {
-			throw e;
-		}
+			fotos.forEach((str, foto) -> {
+					try {
+						InputStream is = foto.getInputStream();
+						boolean result =  ftpService.upload("./2023/" + foto.getOriginalFilename() , is);
+					}  catch (Exception e) {
+						return;
+					}				
+			});
+//			List<String> fileNames = Arrays
+//		            .stream(fotos)
+//		            .map(MultipartFile::getOriginalFilename)
+//		            .collect(Collectors.toList());
+//			fileNames.forEach((file) -> {
+//				logger.info(file);}
+//			);
+//			fptFtpService.upload("/2023", foto1.getInputStream());
+//			fptFtpService.upload("/home/desaparecidos/2023", foto2.getInputStream());
 	}
 
-	@ResponseStatus(HttpStatus.CREATED)
-	@RequestMapping(consumes = { MediaType.MULTIPART_FORM_DATA }, path = "/novo", method = RequestMethod.POST)
-	public @ResponseBody void adicionar(@ModelAttribute RegistroMultiPartJson registroJson) {
-		try {
-			
-				Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getRegistro().cpfUsuario);
-	
-				Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getRegistro().pessoa);
-	
-				Registro registro = registroJsonConvert.toDomainObject(registroJson.getRegistro());
-	
-				registro.setUsuario(usuario);
-				registro.setPessoas(new ArrayList<>());
-				registro.getPessoas().add(pessoa);
-	
-				registroService.salvar(registro);
-	
-			} catch (Exception e) {
-				throw new ErroAoSalvarRegistroException(e.getMessage());
-		}
-	}
+//	@ResponseStatus(HttpStatus.CREATED)
+//	@RequestMapping(consumes = { MediaType.MULTIPART_FORM_DATA }, path = "/novo", method = RequestMethod.POST)
+//	public @ResponseBody void adicionar(@ModelAttribute RegistroMultiPartJson registroJson) {
+//		try {
+//			
+//				Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getRegistro().cpfUsuario);
+//	
+//				Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getRegistro().pessoa);
+//	
+//				Registro registro = registroJsonConvert.toDomainObject(registroJson.getRegistro());
+//	
+//				registro.setUsuario(usuario);
+//				registro.setPessoas(new ArrayList<>());
+//				registro.getPessoas().add(pessoa);
+//	
+//				registroService.salvar(registro);
+//	
+//			} catch (Exception e) {
+//				throw new ErroAoSalvarRegistroException(e.getMessage());
+//		}
+//	}
 
 	@GetMapping("/usuario/{cpf}")
 	@ResponseStatus(HttpStatus.OK)
