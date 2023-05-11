@@ -42,7 +42,7 @@ public class FTPService {
 	
 	public Boolean uploadFile(String remoteFilePath, InputStream inputStream) throws IOException {
 		FTPClient ftpClient = clientFactory.createClient();
-		ftpClient.changeWorkingDirectory(remoteFilePath);
+//		ftpClient.changeWorkingDirectory(remoteFilePath);
 		String destination = remoteFilePath;
 		try {
 			if(inputStream.available() > 0) {

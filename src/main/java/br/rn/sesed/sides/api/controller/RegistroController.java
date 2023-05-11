@@ -1,11 +1,9 @@
 package br.rn.sesed.sides.api.controller;
 
 
-import java.io.InputStream;
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,8 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +30,6 @@ import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
 import br.rn.sesed.sides.core.ftp.FTPProperties;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
-import br.rn.sesed.sides.domain.exception.ErroAoSalvarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
@@ -40,7 +37,9 @@ import br.rn.sesed.sides.domain.service.FTPService;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
 import br.rn.sesed.sides.domain.service.UsuarioService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/registro")
 public class RegistroController {
@@ -68,19 +67,35 @@ public class RegistroController {
 	@Autowired
 	private FTPService ftpService;
 	
+	@Autowired
 	private FTPProperties properties;
 		
-	@RequestMapping( method = RequestMethod.POST,path = "/novo", consumes = { MediaType.MULTIPART_FORM_DATA })
+	@PostMapping(path = "/novo")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public void testFtp(@RequestParam Map<String,MultipartFile> fotos, @RequestParam(name = "registro", required = false) String registro)throws Exception {
+	public void testFtp(@RequestParam(name = "fotos") MultipartFile[] files, @RequestPart(name = "registro") String registro)throws Exception {
 		
-			fotos.forEach((str, foto) -> {
+		log.info("Map de Fotos (SIZE) ------> {}", files.length);
+		Arrays.stream(files).forEach(
+				t -> {
 					try {
-						ftpService.uploadFile(properties.getRemoteFilePath() + foto.getOriginalFilename() , foto.getInputStream());
-					}  catch (Exception e) {
-						throw new ErroAoSalvarFtpException(e.getMessage());
-					}				
-			});
+					
+						log.info("Content Type -> {}", t.getContentType());
+						if(t.getContentType().contains("image")) {
+						ftpService.uploadFile(properties.getRemoteFilePath() + t.getOriginalFilename() , t.getInputStream());
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+				);
+		
+//			fotos.forEach((str, foto) -> {
+//					try {
+//						ftpService.uploadFile(properties.getRemoteFilePath() + foto.getOriginalFilename() , foto.getInputStream());
+//					}  catch (Exception e) {
+//						throw new ErroAoSalvarFtpException(e.getMessage());
+//					}				
+//			});
 	}
 
 //	@ResponseStatus(HttpStatus.CREATED)
