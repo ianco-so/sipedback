@@ -9,9 +9,11 @@ import java.io.OutputStream;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.jboss.jandex.ThrowsTypeTarget;
 import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.core.ftp.FTPClientFactory;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarFtpException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,9 +46,10 @@ public class FTPService {
 		String destination = remoteFilePath;
 		try {
 			if(inputStream.available() > 0) {
-				Boolean ret = ftpClient.storeFile(destination, inputStream);
-				log.info("Salvo?: {} {}", ret, ftpClient.getReplyCode());
-				return ret;
+				if(!ftpClient.storeFile(destination, inputStream)) {
+					throw new ErroAoSalvarFtpException(ftpClient.getReplyString());
+				}
+				return true;
 			}
 		} finally {
 			ftpClient.disconnect();

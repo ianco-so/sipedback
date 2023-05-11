@@ -30,7 +30,9 @@ import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
+import br.rn.sesed.sides.core.ftp.FTPProperties;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
@@ -65,31 +67,20 @@ public class RegistroController {
 	
 	@Autowired
 	private FTPService ftpService;
+	
+	private FTPProperties properties;
 		
 	@RequestMapping( method = RequestMethod.POST,path = "/novo", consumes = { MediaType.MULTIPART_FORM_DATA })
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public void testFtp(@RequestParam Map<String,MultipartFile> fotos, @RequestParam(name = "registro", required = false) String registro)throws Exception {
 		
-			//Calendar calendar = Calendar.getInstance();
-			//String ano = String.valueOf(Calendar.YEAR);
-			
 			fotos.forEach((str, foto) -> {
 					try {
-						InputStream is = foto.getInputStream();
-						boolean result =  ftpService.uploadFile("./2023/" + foto.getOriginalFilename() , is);
+						ftpService.uploadFile(properties.getRemoteFilePath() + foto.getOriginalFilename() , foto.getInputStream());
 					}  catch (Exception e) {
-						return;
+						throw new ErroAoSalvarFtpException(e.getMessage());
 					}				
 			});
-//			List<String> fileNames = Arrays
-//		            .stream(fotos)
-//		            .map(MultipartFile::getOriginalFilename)
-//		            .collect(Collectors.toList());
-//			fileNames.forEach((file) -> {
-//				logger.info(file);}
-//			);
-//			fptFtpService.upload("/2023", foto1.getInputStream());
-//			fptFtpService.upload("/home/desaparecidos/2023", foto2.getInputStream());
 	}
 
 //	@ResponseStatus(HttpStatus.CREATED)

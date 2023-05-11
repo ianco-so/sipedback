@@ -13,4 +13,5 @@ public class FTPProperties {
     private int port;
     private String username;
     private String password;
+    private String remoteFilePath;
 }
