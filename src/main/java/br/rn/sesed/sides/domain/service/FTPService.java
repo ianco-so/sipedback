@@ -9,10 +9,12 @@ import java.io.OutputStream;
 
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
-import org.jboss.jandex.ThrowsTypeTarget;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.core.ftp.FTPClientFactory;
+import br.rn.sesed.sides.core.ftp.FTPProperties;
+import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarFtpException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -20,30 +22,27 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class FTPService {
 	private final FTPClientFactory clientFactory;
-
+	@Autowired
+	private FTPProperties properties;
 	public FTPService(FTPClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 	}
 
-	public void uploadFile(String remoteFilePath, File localFile) throws IOException {
-		FTPClient ftpClient = clientFactory.createClient();
-		ftpClient.changeWorkingDirectory(remoteFilePath);
-		String destination = remoteFilePath;
-		if (destination.endsWith("/")) {
-	          destination += localFile.getName();
-	        }
-		try (InputStream inputStream = new FileInputStream(localFile)) {
-			Boolean ret = ftpClient.storeFile(destination, inputStream);
-			log.info("Salvo?: {} {}", ret, ftpClient.getReplyCode());
-		} finally {
-			ftpClient.disconnect();
+	public void status() throws IOException {
+		try {
+			FTPClient ftpClient = clientFactory.createClient();
+			if(!ftpClient.sendNoOp()) {
+				throw new ErroAoConectarFtpException("Erro conectando FTP");
+			}
+		}catch (Exception e) {
+			throw e;
 		}
 	}
 	
+	
 	public Boolean uploadFile(String remoteFilePath, InputStream inputStream) throws IOException {
 		FTPClient ftpClient = clientFactory.createClient();
-//		ftpClient.changeWorkingDirectory(remoteFilePath);
-		String destination = remoteFilePath;
+		String destination = properties.getRemoteFilePath() + remoteFilePath;
 		try {
 			if(inputStream.available() > 0) {
 				if(!ftpClient.storeFile(destination, inputStream)) {
@@ -79,6 +78,28 @@ public class FTPService {
     		
     	}
     	ftpClient.disconnect();
+    	
+    }
+	
+	public Boolean existDir(String directory) throws IOException {
+    	FTPClient ftpClient = clientFactory.createClient();
+    	ftpClient.changeWorkingDirectory(properties.getRemoteFilePath() + directory);
+        if (ftpClient.getReplyCode() == 550) {
+            return false;
+        }      
+    	ftpClient.disconnect();
+		return true;
+    	
+    }
+	
+	public Boolean createDir(String directory) throws IOException {
+    	FTPClient ftpClient = clientFactory.createClient();
+    	ftpClient.mkd(properties.getRemoteFilePath() + directory);
+        if (ftpClient.getReplyCode() == 550) {
+            return false;
+        }      
+    	ftpClient.disconnect();
+		return true;
     	
     }
     

@@ -1,7 +1,7 @@
 package br.rn.sesed.sides.api.controller;
 
-
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,14 +25,18 @@ import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
+import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
 import br.rn.sesed.sides.core.ftp.FTPProperties;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
+import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.service.FTPService;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
@@ -48,7 +52,7 @@ public class RegistroController {
 
 	@Autowired
 	private PessoaService pessoaService;
-	
+
 	@Autowired
 	private PessoaJsonConvert pessoaJsonConvert;
 
@@ -57,45 +61,58 @@ public class RegistroController {
 
 	@Autowired
 	private RegistroDtoConvert registroDtoConvert;
-	
+
 	@Autowired
 	private UsuarioService usuarioService;
 
 	@Autowired
 	private RegistroService registroService;
-	
+
 	@Autowired
 	private FTPService ftpService;
-	
+
 	@Autowired
 	private FTPProperties properties;
-		
+
 	@PostMapping(path = "/novo")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public void testFtp(@RequestParam(name = "fotos") MultipartFile[] files, @RequestPart(name = "registro") String registro)throws Exception {
-		
-		log.info("Map de Fotos (SIZE) ------> {}", files.length);
-		Arrays.stream(files).forEach(
-				t -> {
-					try {
-					
-						log.info("Content Type -> {}", t.getContentType());
-						if(t.getContentType().contains("image")) {
-						ftpService.uploadFile(properties.getRemoteFilePath() + t.getOriginalFilename() , t.getInputStream());
+	public void adicionar(@RequestParam(name = "fotos") MultipartFile[] files,
+			@RequestPart(name = "registro") String registro){
+		try {
+
+			ftpService.status();
+			
+			RegistroJson registroJson = registroJsonConvert.toJsonObject(registro);			
+			
+			Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getCpfUsuario());
+
+			Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getPessoa());
+
+			Registro registroDesaparecido = registroJsonConvert.toDomainObject(registroJson);
+
+			registroDesaparecido.setUsuario(usuario);
+			registroDesaparecido.setPessoas(new ArrayList<>());
+			registroDesaparecido.getPessoas().add(pessoa);
+
+			Pessoa pessoaSalva = registroService.salvar(registroDesaparecido).getPessoas().get(0);
+			
+			Arrays.stream(files).forEach(t -> {
+				try {
+					if (t.getContentType().contains("image")) {						
+						if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+							 ftpService.createDir(String.valueOf(pessoaSalva.getId()));
 						}
-					} catch (IOException e) {
-						e.printStackTrace();
+						ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + t.getOriginalFilename(), t.getInputStream());				
 					}
+				} catch (IOException e) {
+					throw new ErroAoSalvarRegistroException(e.getMessage());
 				}
-				);
-		
-//			fotos.forEach((str, foto) -> {
-//					try {
-//						ftpService.uploadFile(properties.getRemoteFilePath() + foto.getOriginalFilename() , foto.getInputStream());
-//					}  catch (Exception e) {
-//						throw new ErroAoSalvarFtpException(e.getMessage());
-//					}				
-//			});
+			});
+		} catch (ErroAoConectarFtpException e) {
+			throw new ErroAoConectarFtpException(e.getMessage());
+		} catch (Exception e) {
+			throw new ErroAoSalvarRegistroException(e.getMessage());
+		}
 	}
 
 //	@ResponseStatus(HttpStatus.CREATED)
@@ -133,7 +150,7 @@ public class RegistroController {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}
 	}
-	
+
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody RegistroDto localizarRegistro(@PathVariable("id") Long id) {
@@ -147,34 +164,32 @@ public class RegistroController {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}
 	}
-	
+
 	@PostMapping("/pessoa")
 	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody List<RegistroDto> localizarRegistroPorPessoa(@RequestBody PessoaJson pessoaJson) {
 		try {
-			
-			
+
 			Pessoa pessoa = pessoaJsonConvert.toDomainObject(pessoaJson);
-			
+
 			List<Registro> registros = registroService.findByPessoa(pessoa);
-			
+
 			return registroDtoConvert.toCollectionModel(registros);
 		} catch (Exception e) {
 			throw new ErroAoSalvarUsuarioException(e.getMessage());
 		}
 	}
-	
+
 	@PostMapping("/vincular")
 	@ResponseStatus(HttpStatus.OK)
 	public void vincular(@RequestBody VincularDto vincularDto) throws Exception {
 		try {
-			pessoaService.vincularRegistroPessoa(vincularDto.getIdp(),vincularDto.getIdr());
+			pessoaService.vincularRegistroPessoa(vincularDto.getIdp(), vincularDto.getIdr());
 		} catch (Exception e) {
 			throw e;
 		}
 	}
 
-	
 //	@PostMapping("/pessoa")
 //	@ResponseStatus(HttpStatus.OK)
 //	public @ResponseBody List<RegistroDto> localizarRegistroporPessoa(@RequestBody PessoaJson pessoaJson) {

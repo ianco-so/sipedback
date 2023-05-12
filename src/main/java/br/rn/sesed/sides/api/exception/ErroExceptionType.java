@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ErroExceptionType {
 	DADOS_INVALIDOS("/dados-invalidos", "Dados inválidos"),
 	RECURSO_NAO_ENCONTRADO("/recurso-nao-encontrado", "Recurso não encontrado"),
-	ENTRADA_DUPLICADA("/entrada-duplicada",  "Entrada duplicada");
+	ENTRADA_DUPLICADA("/entrada-duplicada",  "Entrada duplicada"),
+	FALHA_FTP("/falha-ftp", "Falha ao salvar no FTP");
 	
 	private String title;
 	private String uri;

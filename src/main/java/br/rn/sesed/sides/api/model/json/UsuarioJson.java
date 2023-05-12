@@ -10,5 +10,6 @@ public class UsuarioJson {
 	private String senha;
 	private String cpf;
 	private String telefone;
+	private String instituicao;
 	
 }

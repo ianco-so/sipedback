@@ -6,6 +6,8 @@ import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.springframework.stereotype.Component;
 
+import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
+
 @Component
 public class FTPClientFactory {
 	 private final FTPProperties properties;
@@ -21,8 +23,9 @@ public class FTPClientFactory {
 	            ftpClient.login(properties.getUsername(), properties.getPassword());
 	            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
 	            ftpClient.enterLocalPassiveMode();
+	            ftpClient.pwd();
 	        } catch (IOException e) {
-	            throw new RuntimeException("Falha criando FTP client", e);
+	            throw new ErroAoConectarFtpException("Falha criando FTP client");
 	        }
 	        return ftpClient;
 	    }

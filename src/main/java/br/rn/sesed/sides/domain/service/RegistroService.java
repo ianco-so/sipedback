@@ -72,14 +72,14 @@ public class RegistroService {
 //	}
 
 	@Transactional
-	public void salvar(Registro registro) {
+	public Registro salvar(Registro registro) {
 		try {
 			Pessoa pessoa = pessoaService.salvar(registro.getPessoas().get(0));
 			registro.getPessoas().clear();
 			registro.getPessoas().add(pessoa);
-			Registro reg = registroRepository.save(registro);
+			return registroRepository.save(registro);
 		} catch (Exception e) {
-			e.printStackTrace();
+ 			e.printStackTrace();
 			throw e;
 		}
 	}

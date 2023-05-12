@@ -15,6 +15,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.fasterxml.jackson.databind.JsonMappingException.Reference;
 
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
+import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 
@@ -63,6 +65,35 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return handleExceptionInternal(ex, erroException, new HttpHeaders(), status, request);
 	}
+
+	@ExceptionHandler(ErroAoSalvarFtpException.class)
+	public ResponseEntity<?> handleErroAoSalvarFtp(ErroAoSalvarFtpException ex,	WebRequest request) {
+		
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		ErroExceptionType erroExceptionType = ErroExceptionType.FALHA_FTP;
+		String detail = ex.getMessage();
+		
+		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)
+				.userMessage(detail)
+				.build();
+		
+		return handleExceptionInternal(ex, erroException, new HttpHeaders(), status, request);
+	}
+	
+	@ExceptionHandler(ErroAoConectarFtpException.class)
+	public ResponseEntity<?> handleErroAoCOnectarFtp(ErroAoConectarFtpException ex,	WebRequest request) {
+		
+		HttpStatus status = HttpStatus.FORBIDDEN;
+		ErroExceptionType erroExceptionType = ErroExceptionType.FALHA_FTP;
+		String detail = ex.getMessage();
+		
+		ErroException erroException = createProblemBuilder(status, erroExceptionType, detail)
+				.userMessage(detail)
+				.build();
+		
+		return handleExceptionInternal(ex, erroException, new HttpHeaders(), status, request);
+	}
+
 	
 	private ErroException.ErroExceptionBuilder createProblemBuilder(HttpStatus status,
 			ErroExceptionType erroExceptionType, String detail) {
