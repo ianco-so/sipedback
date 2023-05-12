@@ -52,8 +52,7 @@ public class RegistroDtoConvert {
 	}
 
 	public List<RegistroSimpleDto> toSimpleCollectionModel(List<Registro> registros) {
-		
-		
+				
 		List<RegistroSimpleDto> registroDtos = registros.stream()
 				.map(registro -> toSimpleDto(registro))
 				.collect(Collectors.toList());
