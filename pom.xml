@@ -6,7 +6,7 @@
 
 	<groupId>br.rn.sesed.sides</groupId>
 	<artifactId>sides</artifactId>
-	<version>1.0.3</version>
+	<version>1.0.4</version>
 	<packaging>war</packaging>
 	<name>Api do Sistema de Desaparecidos - Sides</name>
 	<description>Sistema de Identificação de Desaparecidos - SIDES</description>

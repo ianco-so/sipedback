@@ -1,21 +1,30 @@
 package br.rn.sesed.sides.domain.service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import br.rn.sesed.sides.api.model.json.RegistroJson;
+import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
+import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarEntidadeException;
+import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.repository.PessoaRepository;
 import br.rn.sesed.sides.domain.repository.RegistroRepository;
 
 @Service
 public class RegistroService {
-
 
 	@Autowired
 	private PessoaRepository pessoaRepository;
@@ -26,50 +35,57 @@ public class RegistroService {
 	@Autowired
 	private PessoaService pessoaService;
 
-//	public UsuarioDto autenticarUsuario(UsuarioLoginJson usuarioJson) {
-//		try {
-//			usuarioJson.setCpf(usuarioJson.getCpf().replace(".", "").replace("-", ""));
-//			Optional<Usuario> usuario = usuarioRepository.findByCpfAndSenha(usuarioJson.getCpf(), usuarioJson.getSenha());
-//			if (usuario.isPresent()) {
-//				UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
-//				resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(),usuario.get().getCpf() , usuario.get().getEmail()));
-//				return resultDto;
-//			}else {
-//				throw new UsuarioNaoEncontradoException("Usuario ou Senha inválidos, tente novamente.");
-//			}
-//		} catch (Exception e) {
-//			throw new SidesException(e.getMessage());
-//		}
-//	}
-//		
-//	
-//	public Usuario localizarUsuarioPorNome(String usuarioNome) {
-//		try {
-//			if (!usuarioNome.isBlank()) {
-//				return usuarioRepository.findByNome(usuarioNome).get();	
-//			}else {
-//				throw new SidesException("Nome de usuario não pode ser nulo ou vazio");
-//			}
-//		}catch (Exception e) {
-//			throw new UsuarioNaoEncontradoException(1L,usuarioNome);
-//		}
-//	}	
-//	
-//	public Usuario localizarUsuarioPorId(Long usuarioId) {
-//		try {			
-//			return usuarioRepository.findById(usuarioId).get();
-//		}catch (Exception e) {			
-//			throw new UsuarioNaoEncontradoException(usuarioId);
-//		}		
-//	}
-//	
-//	public Usuario localizarUsuarioPorCpf(String usuarioCpf) {
-//		try {			
-//			return usuarioRepository.findByCpf(usuarioCpf).get();
-//		}catch (Exception e) {			
-//			throw new UsuarioNaoEncontradoException(usuarioCpf);
-//		}		
-//	}
+	@Autowired
+	private UsuarioService usuarioService;
+
+	@Autowired
+	private PessoaJsonConvert pessoaJsonConvert;
+
+	@Autowired
+	private FTPService ftpService;
+
+	@Autowired
+	private RegistroJsonConvert registroJsonConvert;
+
+	@Transactional
+	public Registro salvar(MultipartFile[] files, String registro) throws IOException {
+		try {
+			ftpService.status();
+
+			RegistroJson registroJson = registroJsonConvert.toJsonObject(registro);
+
+			Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getCpfUsuario());
+
+			Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getPessoa());
+
+			Registro registroDesaparecido = registroJsonConvert.toDomainObject(registroJson);
+
+			registroDesaparecido.setUsuario(usuario);
+			registroDesaparecido.setPessoas(new ArrayList<>());
+			registroDesaparecido.getPessoas().add(pessoa);
+
+			Registro registroSalvo = this.salvar(registroDesaparecido);
+			Pessoa pessoaSalva = registroSalvo.getPessoas().get(0);
+
+			Arrays.stream(files).forEach(t -> {
+				try {
+					if (t.getContentType().contains("image")) {
+						if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+							ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+						}
+						ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
+								t.getInputStream());
+					}
+				} catch (IOException e) {
+					throw new ErroAoSalvarRegistroException(e.getMessage());
+				}
+			});
+
+			return registroSalvo;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
 
 	@Transactional
 	public Registro salvar(Registro registro) {
@@ -79,8 +95,7 @@ public class RegistroService {
 			registro.getPessoas().add(pessoa);
 			return registroRepository.save(registro);
 		} catch (Exception e) {
- 			e.printStackTrace();
-			throw e;
+			throw new ErroAoSalvarEntidadeException(e.getMessage());
 		}
 	}
 
@@ -111,13 +126,12 @@ public class RegistroService {
 	}
 
 	public List<Registro> findByPessoa(Pessoa pessoa) {
-		try {	
+		try {
 			return pessoaRepository.findByNome(pessoa.getNome()).getRegistros();
 		} catch (Exception e) {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}
 	}
-
 
 //	public List<Registro> localizarPorPessoas(List<Pessoa> pessoas) {
 //		try {

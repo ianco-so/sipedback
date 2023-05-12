@@ -28,15 +28,15 @@ public class FTPService {
 		this.clientFactory = clientFactory;
 	}
 
-	public void status() throws IOException {
+	public void status() {
 		try {
 			FTPClient ftpClient = clientFactory.createClient();
 			if(!ftpClient.sendNoOp()) {
-				throw new ErroAoConectarFtpException("Erro conectando FTP");
+				throw new ErroAoConectarFtpException("Erro conectando FTP");				
 			}
-		}catch (Exception e) {
-			throw e;
+		}catch (IOException e) {
 		}
+
 	}
 	
 	

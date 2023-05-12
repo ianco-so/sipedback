@@ -13,8 +13,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.transaction.annotation.Transactional;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -228,6 +230,10 @@ public class Pessoa {
 	
 	@Column(name = "st_terceirafoto")
 	private String terceiraFoto;
+	
+	@Transient
+	private List<Foto> fotos;
+	
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "registro_pessoa", joinColumns = @JoinColumn(name = "ce_pessoa"), inverseJoinColumns = @JoinColumn(name = "ce_registro"))

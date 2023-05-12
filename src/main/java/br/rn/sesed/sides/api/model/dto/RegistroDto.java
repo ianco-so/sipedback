@@ -66,5 +66,4 @@ public class RegistroDto {
 	public List<PessoaDto> pessoas;
 	
 	
-	
 }
