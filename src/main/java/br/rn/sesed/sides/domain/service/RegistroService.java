@@ -119,7 +119,12 @@ public class RegistroService {
 	public Registro localizarPorId(Long id) {
 
 		try {
-			return registroRepository.findById(id).get();
+			ftpService.listDir("/");
+			Registro reg = registroRepository.findById(id).get();
+			for(Pessoa pessoa: reg.getPessoas()) {
+				pessoa.setFotos(ftpService.getFotosFromRegistroId("/"+pessoa.getId()+"/"));
+			}
+			return reg;
 		} catch (Exception e) {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}

@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 
+
 @Component
 public class FtpClientComponent {
 	private static final Logger logger = LoggerFactory.getLogger(FtpClientComponent.class);
@@ -29,11 +30,6 @@ public class FtpClientComponent {
         return ftpClient;
     }
     
-    public InputStream download(String remoteFilePath) throws IOException {
-    	InputStream inputstream = ftpClient.retrieveFileStream(remoteFilePath);
-    	return inputstream;
-    }
-
     public boolean upload(String path, InputStream input) throws IOException {
     	try {
     		FTPClient ftp = connect();
