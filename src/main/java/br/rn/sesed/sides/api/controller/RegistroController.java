@@ -1,7 +1,8 @@
 package br.rn.sesed.sides.api.controller;
 
-import java.io.IOException;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +28,6 @@ import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
-import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
@@ -56,13 +56,15 @@ public class RegistroController {
 
 	@PostMapping(path = "/novo")
 	@ResponseStatus(code = HttpStatus.CREATED)
-	public void adicionar(@RequestParam(name = "fotos") MultipartFile[] files,	@RequestPart(name = "registro") String registro) {
+	public void adicionar(	@RequestParam(name = "fotos", required = false) MultipartFile[] files,	
+							@RequestPart(name = "registro", required = false) String registro,
+							HttpServletRequest request) throws Exception {
 		try {
 			registroService.salvar(files,registro);						
 		} catch (ErroAoConectarFtpException e) {
 			throw new ErroAoConectarFtpException(e.getMessage());
 		} catch (Exception e) {
-			throw new ErroAoConectarFtpException(e.getMessage());
+			throw e;
 		}
 	}
 

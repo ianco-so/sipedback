@@ -1,6 +1,5 @@
 package br.rn.sesed.sides.api.model.dto;
 
-import java.util.Date;
 import java.util.List;
 
 import lombok.Data;
@@ -18,7 +17,7 @@ public class PessoaDto {
 
 	private String NomeSocial;
 
-	private Date dataNascimento;
+	private String dataNascimento;
 
 	private int idadeAproximada;
 
@@ -142,9 +141,6 @@ public class PessoaDto {
 	
 	private String terceiraFoto;
 	
-	private List<FotoDto> fotos;
-
-//	List<RegistroDto> registros;
-	
+	private List<FotoDto> fotos;	
 	
 }

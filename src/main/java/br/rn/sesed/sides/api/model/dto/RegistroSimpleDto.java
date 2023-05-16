@@ -1,9 +1,5 @@
 package br.rn.sesed.sides.api.model.dto;
 
-import java.util.Date;
-import java.util.List;
-
-import br.rn.sesed.sides.domain.model.Pessoa;
 import lombok.Data;
 
 @Data
@@ -19,11 +15,11 @@ public class RegistroSimpleDto {
 
 	public String delegacia;
 
-	public Date dataBoletim;
+	public String dataBoletim;
 	
-	public Date dataRegistro;
+	public String dataRegistro;
 
-	public Date dataDesaparecimento;
+	public String dataDesaparecimento;
 
 	public String cep;
 
