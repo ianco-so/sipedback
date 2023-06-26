@@ -11,8 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
+import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarEntidadeException;
@@ -46,6 +48,9 @@ public class RegistroService {
 
 	@Autowired
 	private RegistroJsonConvert registroJsonConvert;
+	
+	@Autowired
+	private RegistroDtoConvert registroDtoConvert;
 
 	@Transactional
 	public Registro salvar(MultipartFile[] files, String registro) throws IOException {
@@ -94,6 +99,30 @@ public class RegistroService {
 			registro.getPessoas().clear();
 			registro.getPessoas().add(pessoa);
 			return registroRepository.save(registro);
+		} catch (Exception e) {
+			throw new ErroAoSalvarEntidadeException(e.getMessage());
+		}
+	}
+	
+	@Transactional
+	public RegistroDto salvar(MultipartFile[] files) {
+		try {			
+			Registro pessoaSalva = this.salvar(new Registro());	
+			Arrays.stream(files).forEach(t -> {
+				try {
+					if (t.getContentType().contains("image")) {
+						if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+							ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+						}
+						ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
+								t.getInputStream());
+					}
+				} catch (IOException e) {
+					throw new ErroAoSalvarRegistroException(e.getMessage());
+				}
+			});	
+			RegistroDto dto = registroDtoConvert.toDto(pessoaSalva);
+			return dto;
 		} catch (Exception e) {
 			throw new ErroAoSalvarEntidadeException(e.getMessage());
 		}

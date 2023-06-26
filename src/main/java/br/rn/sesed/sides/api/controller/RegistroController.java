@@ -24,6 +24,7 @@ import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
+import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
@@ -61,6 +62,21 @@ public class RegistroController {
 							HttpServletRequest request) throws Exception {
 		try {
 			registroService.salvar(files,registro);						
+		} catch (ErroAoConectarFtpException e) {
+			throw new ErroAoConectarFtpException(e.getMessage());
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+	
+	@PostMapping(path = "/novo")
+	public @ResponseBody RegistroDto getNovoRegistroPorFotoso(@RequestParam(name = "fotos") MultipartFile[] files, HttpServletRequest request) throws Exception {
+		try {
+			if(files.length == 0 || files == null) {
+				throw new Exception("Lista de fotos é inválida");
+			}
+			RegistroDto dto = registroService.salvar(files);			
+			return dto;
 		} catch (ErroAoConectarFtpException e) {
 			throw new ErroAoConectarFtpException(e.getMessage());
 		} catch (Exception e) {
