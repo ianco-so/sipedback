@@ -220,15 +220,6 @@ public class Pessoa {
 
 	@Column(name = "st_marcas")
 	private String marcas;
-
-	@Column(name = "st_fotoprincipal")
-	private String fotoPrincipal;
-	
-	@Column(name = "st_segundafoto")
-	private String segundaFoto;
-	
-	@Column(name = "st_terceirafoto")
-	private String terceiraFoto;
 	
 	@Transient
 	private List<Foto> fotos;
