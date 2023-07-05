@@ -106,8 +106,11 @@ public class RegistroService {
 	
 	@Transactional
 	public RegistroDto salvar(MultipartFile[] files) {
-		try {			
-			Registro pessoaSalva = this.salvar(new Registro());	
+		try {
+			Registro reg = new Registro();
+			List<Pessoa> pessoa = new ArrayList<>();
+			reg.setPessoas(pessoa);
+			Registro pessoaSalva = this.salvar(reg);	
 			Arrays.stream(files).forEach(t -> {
 				try {
 					if (t.getContentType().contains("image")) {
