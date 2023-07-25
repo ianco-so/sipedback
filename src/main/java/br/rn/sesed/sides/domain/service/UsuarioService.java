@@ -1,5 +1,6 @@
 package br.rn.sesed.sides.domain.service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import br.rn.sesed.sides.core.security.Encrypt;
 import br.rn.sesed.sides.core.security.GenerateToken;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
+import br.rn.sesed.sides.domain.exception.UsuarioInvalidoException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
+import br.rn.sesed.sides.domain.exception.UsuarioNaoValidado;
 import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.repository.UsuarioRepository;
 import br.rn.sesed.sides.exception.SidesException;
@@ -35,13 +38,33 @@ public class UsuarioService {
 			usuarioJson.setCpf(usuarioJson.getCpf().replace(".", "").replace("-", ""));
 			Optional<Usuario> usuario = usuarioRepository.findByCpfAndSenha(usuarioJson.getCpf(), Encrypt.getMD5(usuarioJson.getSenha()));
 			if (usuario.isPresent()) {
-				UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
-				resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(),usuario.get().getCpf() , usuario.get().getEmail()));
-				return resultDto;
+				if(usuario.get().getBoValidado()) {
+					UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
+					resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(),usuario.get().getCpf() , usuario.get().getEmail()));
+					return resultDto;					
+				}else {
+					throw new UsuarioNaoValidado();
+				}
 			}else {
 				throw new UsuarioNaoEncontradoException("Usuario ou Senha inválidos, tente novamente.");
 			}
 		} catch (Exception e) {
+			throw new SidesException(e.getMessage());
+		}
+	}
+	
+	public void validaUsuario(Long id) {
+		try {
+			if (id != null) {
+				Usuario user = usuarioRepository.findById(id).get();
+				user.setBoValidado(true);
+				usuarioRepository.save(user);
+			}else {
+				throw new SidesException("O idd de usuario não pode ser nulo ou vazio");
+			}
+		}catch (NoSuchElementException e) {
+			throw new UsuarioNaoEncontradoException(id);
+		}catch(Exception e) {
 			throw new SidesException(e.getMessage());
 		}
 	}

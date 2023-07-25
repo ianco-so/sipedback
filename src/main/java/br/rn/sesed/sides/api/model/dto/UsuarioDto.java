@@ -11,4 +11,6 @@ public class UsuarioDto {
 	private String telefone;
 	private String token;
 	private String instituicao;
+	private Boolean boAtivo;
+	private Boolean boValidado;
 }

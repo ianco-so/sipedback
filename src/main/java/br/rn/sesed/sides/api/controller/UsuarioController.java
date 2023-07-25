@@ -62,6 +62,16 @@ public class UsuarioController {
 			throw new ErroAoSalvarUsuarioException(e.getMessage());
 		}
 	}
+	
+	@PostMapping("/validar/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void adicionar(@PathVariable(name = "id") Long id) {
+		try {
+			usuarioService.validaUsuario(id);
+		} catch (Exception e) {
+			throw new ErroAoSalvarUsuarioException(e.getMessage());
+		}
+	}
 
 //	@Security
 	@GetMapping(value = "/recuperar/{cpf}")

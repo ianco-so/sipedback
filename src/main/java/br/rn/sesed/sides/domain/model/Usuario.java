@@ -59,4 +59,8 @@ public class Usuario {
 	
 	@Column(name = "st_instituicao")
 	private String instituicao;
+	
+	@Column(name = "bo_ativo")
+	private Boolean boAtivo;
+	
 }
