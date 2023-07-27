@@ -1,5 +1,6 @@
 package br.rn.sesed.sides.domain.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -13,7 +14,6 @@ import br.rn.sesed.sides.core.security.Encrypt;
 import br.rn.sesed.sides.core.security.GenerateToken;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
-import br.rn.sesed.sides.domain.exception.UsuarioInvalidoException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoValidado;
 import br.rn.sesed.sides.domain.model.Usuario;
@@ -157,6 +157,16 @@ public class UsuarioService {
 			throw e;
 		}
 		
+	}
+
+	public List<UsuarioDto> getAllUsers(){
+		try {
+			List<Usuario> ususariosnaovalidados = usuarioRepository.findAllByBoValidado(false);
+			List<UsuarioDto> usersDto = usuarioDtoConvert.toCollectionModel(ususariosnaovalidados);
+			return usersDto;
+		}catch(Exception e) {
+			throw e;
+		}
 	}
 	
 }

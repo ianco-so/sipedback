@@ -1,5 +1,7 @@
 package br.rn.sesed.sides.api.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +65,17 @@ public class UsuarioController {
 		}
 	}
 	
-	@PostMapping("/validar/{id}")
+	@GetMapping("/listar/validar")
+	public @ResponseBody List<UsuarioDto> recuperarUsuarios(){
+		try {
+			List<UsuarioDto> users = usuarioService.getAllUsers();
+			return users;
+		}catch(Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());			
+		}
+	}
+	
+	@GetMapping("/validar/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public void adicionar(@PathVariable(name = "id") Long id) {
 		try {
@@ -98,6 +110,8 @@ public class UsuarioController {
 			throw new ErroAoSalvarUsuarioException(e.getMessage());
 		}
 	}
+	
+	
 	
 //	@Security
 //	@GetMapping("/usuario/recuperar/id/{id}")
