@@ -3,7 +3,6 @@ package br.rn.sesed.sides.api.model.dto;
 import java.util.Date;
 import java.util.List;
 
-import br.rn.sesed.sides.domain.model.Pessoa;
 import lombok.Data;
 
 @Data

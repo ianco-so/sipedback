@@ -170,6 +170,15 @@ public class RegistroService {
 		}
 	}
 
+	public List<Registro> findAll() {
+		try {
+			return registroRepository.findAll();
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+	}
+
+
 //	public List<Registro> localizarPorPessoas(List<Pessoa> pessoas) {
 //		try {
 //			return registroRepository.findByPessoas(pessoas);

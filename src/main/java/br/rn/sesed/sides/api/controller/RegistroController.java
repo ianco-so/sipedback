@@ -27,6 +27,7 @@ import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
+import br.rn.sesed.sides.core.modelmapper.ModelMapperConverter;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
@@ -54,6 +55,9 @@ public class RegistroController {
 
 	@Autowired
 	private RegistroService registroService;
+
+	@Autowired
+	private ModelMapperConverter mapperConverter;
 
 	@PostMapping(path = "/novo")
 	@ResponseStatus(code = HttpStatus.CREATED)
@@ -87,6 +91,23 @@ public class RegistroController {
 			throw e;
 		}
 	}
+
+	@PostMapping(path = "/listar")
+	public List<RegistroDto> getListaRegistro() throws Exception {
+		try {
+			
+			List<Registro> registros = registroService.findAll();
+
+			List<RegistroDto> registroDtos = mapperConverter.mapToList(registros, RegistroDto.class);
+
+			return registroDtos;
+		} catch (ErroAoConectarFtpException e) {
+			throw new ErroAoConectarFtpException(e.getMessage());
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
 
 	@GetMapping("/usuario/{cpf}")
 	@ResponseStatus(HttpStatus.OK)
