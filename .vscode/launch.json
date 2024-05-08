@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-SidesApplication<sides>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "br.rn.sesed.sides.SidesApplication",
+            "projectName": "sides",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

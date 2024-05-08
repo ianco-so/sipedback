@@ -1,0 +1,36 @@
+package br.rn.sesed.sides.domain.repository;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import br.rn.sesed.sides.domain.model.Pessoa;
+import br.rn.sesed.sides.domain.model.Registro;
+
+@Repository
+public interface RegistroRepository extends CustomJpaRepository<Registro, Long>, JpaSpecificationExecutor<Registro>,
+		PagingAndSortingRepository<Registro, Long> {
+
+//	@EntityGraph(value = "Registro.pessoasDetail", type = EntityGraphType.LOAD) // Mecanismo para os Fetch no atributo pessoas
+	@Query("from Registro r join fetch r.pessoas rp where r.id = :id")
+	public Optional<Registro> findById(@Param("id") Long id);
+
+	@Query("from Registro r join fetch r.pessoas rp where r.usuario.cpf = :cpf")
+	public List<Registro> findByCpfComunicante(@Param("cpf") String cpfComunicante);
+	
+	@Query("from Registro r where r.usuario.cpf = :cpf")
+	public List<Registro> findBySimpleCpfComunicante(@Param("cpf") String cpfComunicante);
+
+	
+//	public List<Registro> findByPessoas(List<Pessoa> pessoas);
+	
+}
