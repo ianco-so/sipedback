@@ -1,13 +1,20 @@
 package br.rn.sesed.sides.domain.service;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import javax.transaction.Transactional;
+import javax.xml.bind.DatatypeConverter;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -85,6 +92,84 @@ public class RegistroService {
 					throw new ErroAoSalvarRegistroException(e.getMessage());
 				}
 			});
+
+			return registroSalvo;
+		} catch (Exception e) {
+			throw e;
+		}
+	}
+
+	@Transactional
+	public Registro salvar(RegistroJson registroJson) throws IOException {
+		try {
+			ftpService.status();
+
+			
+			Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getCpfUsuario());
+
+			Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getPessoa());
+
+			Registro registroDesaparecido = registroJsonConvert.toDomainObject(registroJson);
+
+			registroDesaparecido.setUsuario(usuario);
+			registroDesaparecido.setPessoas(new ArrayList<>());
+			registroDesaparecido.getPessoas().add(pessoa);
+
+			Registro registroSalvo = this.salvar(registroDesaparecido);
+			Pessoa pessoaSalva = registroSalvo.getPessoas().get(0);
+
+			byte[] imageFotoPrincipal;
+			byte[] imageSegundaFoto;
+			byte[] imageTerceiraFoto;
+			if(pessoa.getFotoPrincipal().getContent().startsWith("data")){
+				var content = pessoa.getFotoPrincipal().getContent();
+				String imageDataBytes = content.substring(content.indexOf(",")+1);
+				imageFotoPrincipal = DatatypeConverter.parseBase64Binary(imageDataBytes);
+				InputStream isFoto = new ByteArrayInputStream(imageFotoPrincipal);
+				if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+				}
+				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + pessoa.getFotoPrincipal().getFileName(),
+				isFoto);
+			}
+
+			if(pessoa.getSegundaFoto().getContent().startsWith("data")){
+				var content = pessoa.getSegundaFoto().getContent();
+				String imageDataBytes = content.substring(content.indexOf(",")+1);
+				imageSegundaFoto = DatatypeConverter.parseBase64Binary(imageDataBytes);
+				InputStream isFoto = new ByteArrayInputStream(imageSegundaFoto);
+				if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+				}
+				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + pessoa.getSegundaFoto().getFileName(),
+				isFoto);
+			}
+			
+			if(pessoa.getTerceiraFoto().getContent().startsWith("data")){
+				var content = pessoa.getTerceiraFoto().getContent();
+				String imageDataBytes = content.substring(content.indexOf(",")+1);
+				imageTerceiraFoto = DatatypeConverter.parseBase64Binary(imageDataBytes);
+				InputStream isFoto = new ByteArrayInputStream(imageTerceiraFoto);
+				if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+				}
+				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + pessoa.getTerceiraFoto().getFileName(),
+				isFoto);
+			}
+
+			// Arrays.stream(files).forEach(t -> {
+			// 	try {
+			// 		if (t.getContentType().contains("image")) {
+			// 			if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+			// 				ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+			// 			}
+			// 			ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
+			// 					t.getInputStream());
+			// 		}
+			// 	} catch (IOException e) {
+			// 		throw new ErroAoSalvarRegistroException(e.getMessage());
+			// 	}
+			// });
 
 			return registroSalvo;
 		} catch (Exception e) {
@@ -179,12 +264,5 @@ public class RegistroService {
 	}
 
 
-//	public List<Registro> localizarPorPessoas(List<Pessoa> pessoas) {
-//		try {
-//			return registroRepository.findByPessoas(pessoas);
-//		} catch (Exception e) {
-//			throw new EntidadeNaoEncontradaException(e.getMessage());
-//		}
-//	}
 
 }

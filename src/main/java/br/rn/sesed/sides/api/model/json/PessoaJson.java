@@ -1,6 +1,10 @@
 package br.rn.sesed.sides.api.model.json;
 
+import java.time.LocalDateTime;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import lombok.Data;
 
@@ -15,7 +19,8 @@ public class PessoaJson {
 	
 	private String NomeSocial;
 	
-	private Date dataNascimento;
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	public LocalDateTime dataNascimento;
 	
 	private int idadeAproximada;
 
@@ -131,9 +136,9 @@ public class PessoaJson {
 
 	private String marcas;
 
-	private String fotoPrincipal;
+	private FileBase64 fotoPrincipal;
 	
-	private String segundaFoto;
+	private FileBase64 segundaFoto;
 	
-	private String terceiraFoto;
+	private FileBase64 terceiraFoto;
 }

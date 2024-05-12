@@ -4,8 +4,6 @@ import java.security.Principal;
 
 import javax.ws.rs.core.SecurityContext;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

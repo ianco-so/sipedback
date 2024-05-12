@@ -1,6 +1,9 @@
 package br.rn.sesed.sides.api.model.json;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import lombok.Data;
 
@@ -18,11 +21,14 @@ public class RegistroJson {
 
 	public String delegacia;
 
-	public Date dataBoletim;
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	public LocalDateTime dataBoletim;
 	
-	public Date dataRegistro;
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	public LocalDateTime dataRegistro;
 
-	public Date dataDesaparecimento;
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	public LocalDateTime dataDesaparecimento;
 
 	public String cep;
 
@@ -63,5 +69,4 @@ public class RegistroJson {
 	public String emailComunicante;
 
 	public String relacacoVitima;
-
 }

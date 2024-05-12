@@ -17,6 +17,7 @@ import javax.persistence.Transient;
 
 import org.hibernate.annotations.DynamicUpdate;
 
+import br.rn.sesed.sides.api.model.json.FileBase64;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -220,6 +221,15 @@ public class Pessoa {
 
 	@Column(name = "st_marcas")
 	private String marcas;
+	
+	@Transient
+	private FileBase64 fotoPrincipal;
+
+	@Transient
+	private FileBase64 segundaFoto;
+
+	@Transient
+	private FileBase64 terceiraFoto;
 	
 	@Transient
 	private List<Foto> fotos;

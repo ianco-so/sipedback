@@ -5,10 +5,10 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,6 +25,7 @@ import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
+import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.core.modelmapper.ModelMapperConverter;
@@ -35,15 +36,15 @@ import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
 @RestController
 @RequestMapping("/registro")
 public class RegistroController {
-
-	private static final Logger logger = LoggerFactory.getLogger(RegistroController.class);
-
+	
+	@Autowired
+	BuildProperties buildProperties;
+	
 	@Autowired
 	private PessoaService pessoaService;
 
@@ -91,6 +92,31 @@ public class RegistroController {
 			throw e;
 		}
 	}
+
+	@PostMapping("/boletim")
+	@ResponseStatus(HttpStatus.CREATED)
+	public @ResponseBody RegistroDto postNovoRegistro(@RequestBody RegistroJson registroJson) throws Exception {
+		try {
+				
+			Registro temp = registroService.salvar(registroJson);
+			RegistroDto dto = registroDtoConvert.toDto(temp);
+			return dto;
+
+		}catch (org.springframework.security.core.AuthenticationException e) {
+ 			e.printStackTrace();
+	   		System.out.println("dando ruim aqui");
+			return null;
+		} catch (ErroAoConectarFtpException e) {
+			throw new ErroAoConectarFtpException(e.getMessage());
+		} catch (Exception e) {
+			throw e;
+		}
+	
+	}
+	@PostMapping("/version")
+	public BuildProperties version(@RequestBody String registroJson) {
+		return buildProperties;
+	}	
 
 	@PostMapping(path = "/listar")
 	public List<RegistroDto> getListaRegistro() throws Exception {

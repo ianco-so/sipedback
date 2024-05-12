@@ -33,7 +33,7 @@ import io.swagger.annotations.ApiParam;
 @RequestMapping("/usuario")
 public class UsuarioController {
 
-	private static final Logger logger = LoggerFactory.getLogger(UsuarioController.class);
+
 
 	@Autowired
 	private UsuarioJsonConvert usuarioJsonConvert;
@@ -50,6 +50,21 @@ public class UsuarioController {
 			return usuarioService.autenticarUsuario(usuarioJson);
 		} catch (Exception e) {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+	}
+
+	@PostMapping("/")
+	@ResponseStatus(HttpStatus.OK)
+	public @ResponseBody UsuarioDto loadByCpf(@RequestBody UsuarioJson usuarioJson) {
+		try {
+			Usuario usuario = usuarioJsonConvert.toDomainObject(usuarioJson);
+			var usuarioDomain = usuarioService.localizarUsuarioPorCpf(usuario.getCpf());
+			
+			var usuarioDto = usuarioDtoConvert.toDto(usuarioDomain);
+			
+			return usuarioDto;
+		} catch (Exception e) {
+			throw new ErroAoSalvarUsuarioException(e.getMessage());
 		}
 	}
 
