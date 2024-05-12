@@ -1,7 +1,5 @@
 package br.rn.sesed.sides.api.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,8 +21,7 @@ import br.rn.sesed.sides.domain.service.UsuarioService;
 @RequestMapping("/pessoa")
 public class PessoaController {
 
-	private static final Logger logger = LoggerFactory.getLogger(PessoaController.class);
-
+	
 	@Autowired
 	private UsuarioJsonConvert usuarioJsonConvert;
 	
