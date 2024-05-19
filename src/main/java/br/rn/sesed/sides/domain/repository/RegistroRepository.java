@@ -3,17 +3,12 @@ package br.rn.sesed.sides.domain.repository;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
 
 @Repository
@@ -29,6 +24,11 @@ public interface RegistroRepository extends CustomJpaRepository<Registro, Long>,
 	
 	@Query("from Registro r where r.usuario.cpf = :cpf")
 	public List<Registro> findBySimpleCpfComunicante(@Param("cpf") String cpfComunicante);
+
+	@Query("select r.id, r.boletim, r.nomeComunicante, r.pessoas from Registro r")
+    public List<Registro> findAllPesquisa();
+
+    public List<Registro> findByTipoRegistroAndVinculado(Long tipoRegistro, boolean vinculado); 
 
 	
 //	public List<Registro> findByPessoas(List<Pessoa> pessoas);

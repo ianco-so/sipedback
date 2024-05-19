@@ -25,6 +25,7 @@ import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.model.json.RegistroJson;
+import br.rn.sesed.sides.api.model.json.RegistroTypeJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.core.modelmapper.ModelMapperConverter;
@@ -121,7 +122,7 @@ public class RegistroController {
 	public List<RegistroDto> getListaRegistro() throws Exception {
 		try {
 			
-			List<Registro> registros = registroService.findAll();
+			List<Registro> registros = registroService.findAllBoletimNaoVinculado();
 
 			List<RegistroDto> registroDtos = mapperConverter.mapToList(registros, RegistroDto.class);
 
@@ -129,6 +130,24 @@ public class RegistroController {
 		} catch (ErroAoConectarFtpException e) {
 			throw new ErroAoConectarFtpException(e.getMessage());
 		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	@PostMapping(path = "/instituicao/listar")
+	public List<RegistroDto> getListaRegistroInsituicoes(@RequestBody RegistroTypeJson registroTypeJson) throws Exception {
+		try {
+			
+			List<Registro> registros = registroService.findAllRegistoNaoVinculado();
+
+			List<RegistroDto> registroDtos = mapperConverter.mapToList(registros, RegistroDto.class);
+
+			return registroDtos;
+		} catch (ErroAoConectarFtpException e) {
+			throw new ErroAoConectarFtpException(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw e;
 		}
 	}

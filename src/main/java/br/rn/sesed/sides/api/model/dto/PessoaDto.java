@@ -1,7 +1,9 @@
 package br.rn.sesed.sides.api.model.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import br.rn.sesed.sides.api.model.json.FileBase64;
 import lombok.Data;
 
 @Data
@@ -17,7 +19,7 @@ public class PessoaDto {
 
 	private String NomeSocial;
 
-	private String dataNascimento;
+	private LocalDateTime dataNascimento;
 
 	private int idadeAproximada;
 
@@ -135,12 +137,13 @@ public class PessoaDto {
 
 	private String marcas;
 
-	private String fotoPrincipal;
+	private String stFotoprincipal;
+	private String stSegundafoto;
+	private String stTerceirafoto;
 	
-	private String segundaFoto;
-	
-	private String terceiraFoto;
-	
+	private FileBase64 fotoPrincipal;
+    private FileBase64 segundaFoto;
+    private FileBase64 terceiraFoto;
 	private List<FotoDto> fotos;	
 	
 }

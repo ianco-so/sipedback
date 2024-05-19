@@ -1,6 +1,6 @@
 package br.rn.sesed.sides.api.model.dto;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.Data;
@@ -12,15 +12,19 @@ public class RegistroDto {
 
 	public Long tipoRegistro;
 
+	public boolean vinculado;
+
 	public String boletim;
-	
+
+	public PessoaDto pessoa;
+
 	private String NomeSocial;
 
 	public String delegacia;
 
-	public Date dataBoletim;
+	public LocalDateTime dataBoletim;
 
-	public Date dataDesaparecimento;
+	public LocalDateTime dataDesaparecimento;
 
 	public String cep;
 

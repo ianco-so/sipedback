@@ -135,6 +135,12 @@ public class PessoaJson {
 
 	private String marcas;
 
+	private String stFotoprincipal;
+
+	private String stSegundafoto;
+
+	private String stTerceirafoto;
+	
 	private FileBase64 fotoPrincipal;
 	
 	private FileBase64 segundaFoto;

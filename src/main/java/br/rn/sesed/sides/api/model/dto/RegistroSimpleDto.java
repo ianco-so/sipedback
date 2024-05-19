@@ -9,6 +9,8 @@ public class RegistroSimpleDto {
 
 	public Long tipoRegistro;
 
+	public boolean vinculado;
+
 	public String boletim;
 	
 	private String NomeSocial;	

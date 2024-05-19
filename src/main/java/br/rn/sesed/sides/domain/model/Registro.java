@@ -44,6 +44,10 @@ public class Registro {
 	@Column(name = "ce_tiporegistro")
 	public Long tipoRegistro;
 
+	@Column(name = "bo_vinculado")
+	public boolean vinculado;
+
+
 	@Column(name = "st_boletim")
 	public String boletim;
 
@@ -126,10 +130,15 @@ public class Registro {
 	@JoinTable(name = "registro_pessoa", joinColumns = @JoinColumn(name = "ce_registro"), inverseJoinColumns = @JoinColumn(name = "ce_pessoa"))
 	public List<Pessoa> pessoas;
 	
+	@Transient
+	public Pessoa pessoa;
+
+
 	@PostLoad
 	public void onLoad() {
 		if(pessoas != null && !pessoas.isEmpty()) {
 			this.nomeSocial = pessoas.get(0).getNomeSocial();
+			this.pessoa = pessoas.get(0);
 		}
 	}
 	

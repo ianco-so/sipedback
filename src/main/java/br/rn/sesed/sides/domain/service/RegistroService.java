@@ -1,20 +1,16 @@
 package br.rn.sesed.sides.domain.service;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.xml.bind.DatatypeConverter;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -129,7 +125,9 @@ public class RegistroService {
 				if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
 					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
 				}
-				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + pessoa.getFotoPrincipal().getFileName(),
+				int idx = pessoa.getFotoPrincipal().getFileName().indexOf(".");
+				String nomeArquivo = pessoa.getFotoPrincipal().getFileName().replace(pessoa.getFotoPrincipal().getFileName().substring(0, idx),"fotoprinpial");
+				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + nomeArquivo,
 				isFoto);
 			}
 
@@ -141,7 +139,10 @@ public class RegistroService {
 				if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
 					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
 				}
-				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + pessoa.getSegundaFoto().getFileName(),
+
+				int idx = pessoa.getSegundaFoto().getFileName().indexOf(".");
+				String nomeArquivo = pessoa.getSegundaFoto().getFileName().replace(pessoa.getSegundaFoto().getFileName().substring(0, idx),"segundafoto");
+				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + nomeArquivo,
 				isFoto);
 			}
 			
@@ -153,7 +154,10 @@ public class RegistroService {
 				if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
 					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
 				}
-				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + pessoa.getTerceiraFoto().getFileName(),
+				
+				int idx = pessoa.getTerceiraFoto().getFileName().indexOf(".");
+				String nomeArquivo = pessoa.getTerceiraFoto().getFileName().replace(pessoa.getTerceiraFoto().getFileName().substring(0, idx),"terceirafoto");
+				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + nomeArquivo,
 				isFoto);
 			}
 
@@ -175,6 +179,10 @@ public class RegistroService {
 		} catch (Exception e) {
 			throw e;
 		}
+	}
+
+	private void saveFtp(){
+		
 	}
 
 	@Transactional
@@ -257,11 +265,46 @@ public class RegistroService {
 
 	public List<Registro> findAll() {
 		try {
-			return registroRepository.findAll();
+
+			var registros = registroRepository.findAll();
+
+			return registros;
 		} catch (Exception e) {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}
 	}
+
+	public List<Registro> findAllPesquisa() {
+		try {
+			return registroRepository.findAllPesquisa();
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+	}
+
+    public List<Registro> findAllRegistoNaoVinculado() {
+        try {
+
+
+			var registros = registroRepository.findByTipoRegistroAndVinculado(2L, false);
+
+			return registros;
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+    }
+
+    public List<Registro> findAllBoletimNaoVinculado() {
+        try {
+
+
+			var registros = registroRepository.findByTipoRegistroAndVinculado(1L, false);
+
+			return registros;
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+    }
 
 
 

@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import br.rn.sesed.sides.api.model.json.FileBase64;
@@ -28,6 +29,7 @@ import lombok.NoArgsConstructor;
 @Entity(name = "Pessoa")
 @Table(name = "pessoas", schema = "dbo")
 @DynamicUpdate
+@DynamicInsert
 public class Pessoa {
 
 	@EqualsAndHashCode.Include
@@ -51,7 +53,7 @@ public class Pessoa {
 	private Date dataNascimento;
 
 	@Column(name = "nu_idadeaproximada")
-	private int idadeAproximada;
+	private Integer idadeAproximada;
 
 	@Column(name = "st_rg")
 	private String rg;
@@ -157,10 +159,10 @@ public class Pessoa {
 
 	@Column(name = "st_intelectual")
 	private String intelectual;
-	
+
 	@Column(name = "bo_fisica")
 	private Boolean boFisica;
-	
+
 	@Column(name = "st_fisica")
 	private String fisica;
 
@@ -187,7 +189,6 @@ public class Pessoa {
 
 	@Column(name = "bo_comorbidade")
 	private Boolean boComorbidade;
-	
 
 	@Column(name = "st_comorbidade")
 	private String comorbidade;
@@ -221,7 +222,16 @@ public class Pessoa {
 
 	@Column(name = "st_marcas")
 	private String marcas;
-	
+
+	@Column(name = "st_fotoprincipal")
+	private String stFotoprincipal;
+
+	@Column(name = "st_segundafoto")
+	private String stSegundafoto;
+
+	@Column(name = "st_terceirafoto")
+	private String stTerceirafoto;
+
 	@Transient
 	private FileBase64 fotoPrincipal;
 
@@ -230,12 +240,36 @@ public class Pessoa {
 
 	@Transient
 	private FileBase64 terceiraFoto;
-	
+
 	@Transient
 	private List<Foto> fotos;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "registro_pessoa", joinColumns = @JoinColumn(name = "ce_pessoa"), inverseJoinColumns = @JoinColumn(name = "ce_registro"))
 	public List<Registro> registros;
+
 	
+	// @PrePersist
+	// public void prePersist() {
+	// 	if(fotoPrincipal != null && !fotoPrincipal.getContent().isEmpty()) {
+	// 		this.setStFotoprincipal(fotoPrincipal.getContent());
+	// 		this.stFotoprincipal = fotoPrincipal.getContent();
+			
+	// 	}
+	// 	if(segundaFoto != null && !segundaFoto.getContent().isEmpty()) {
+	// 		this.setStSegundafoto(segundaFoto.getContent());
+	// 		this.stSegundafoto = segundaFoto.getContent();
+	// 	}
+	// 	if(terceiraFoto != null && !terceiraFoto.getContent().isEmpty()) {
+	// 		this.setStTerceirafoto(terceiraFoto.getContent());
+	// 		this.stTerceirafoto = terceiraFoto.getContent();
+	// 	}
+	// }
+	// @PostLoad
+	// public void postLoad() {
+
+	// 	fotoPrincipal.setContent(this.stFotoprincipal);
+	// 	segundaFoto.setContent(this.stSegundafoto);
+	// 	terceiraFoto.setContent(this.stTerceirafoto);
+	// }
 }
