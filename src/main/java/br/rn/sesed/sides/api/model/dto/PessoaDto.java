@@ -1,7 +1,10 @@
 package br.rn.sesed.sides.api.model.dto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
 import br.rn.sesed.sides.api.model.json.FileBase64;
 import lombok.Data;
@@ -18,8 +21,9 @@ public class PessoaDto {
 	private Boolean boNomeSocial;
 
 	private String NomeSocial;
-
-	private LocalDateTime dataNascimento;
+	
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
+	private LocalDate dataNascimento;
 
 	private int idadeAproximada;
 

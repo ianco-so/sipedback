@@ -21,7 +21,7 @@ public class ModelMapperConfig {
 			  public String convert(MappingContext<Date, String> context) {
 				  if(context.getSource() != null) {
 					  Date date = context.getSource();
-					  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss:sss'Z'");
+					  SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSX");
 					  sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 					  String formatedDate = sdf.format(date);
 					  return formatedDate;

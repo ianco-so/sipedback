@@ -98,6 +98,26 @@ public class UsuarioController {
 		}
 	}
 
+	@GetMapping("/desativar/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void desativar(@PathVariable(name = "id") Long id) {
+		try {
+			usuarioService.ativarDesativarUsuario(id);
+		} catch (Exception e) {
+			throw new ErroAoSalvarUsuarioException(e.getMessage());
+		}
+	}
+
+	@GetMapping("/ativar/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public void ativar(@PathVariable(name = "id") Long id) {
+		try {
+			usuarioService.ativarDesativarUsuario(id);
+		} catch (Exception e) {
+			throw new ErroAoSalvarUsuarioException(e.getMessage());
+		}
+	}
+
 //	@Security
 	@GetMapping(value = "/recuperar/{cpf}")
 	@ApiOperation(hidden = false, value = "Recuperar senha do usuario.")

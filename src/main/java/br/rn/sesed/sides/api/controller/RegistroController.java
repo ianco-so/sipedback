@@ -4,10 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
+import br.rn.sesed.sides.api.model.dto.VincularRegistroDto;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.model.json.RegistroTypeJson;
@@ -36,8 +40,10 @@ import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
+import lombok.extern.slf4j.Slf4j;
 
 
+@Slf4j
 @RestController
 @RequestMapping("/registro")
 public class RegistroController {
@@ -66,6 +72,12 @@ public class RegistroController {
 							@RequestPart(name = "registro", required = false) String registro,
 							HttpServletRequest request) throws Exception {
 		try {
+
+			
+			registro = registro.replace("T00:00:00.000Z", "");
+
+
+			log.info("Registrando... {}", registro);
 			registroService.salvar(files,registro);						
 		} catch (ErroAoConectarFtpException e) {
 			throw new ErroAoConectarFtpException(e.getMessage());
@@ -135,11 +147,28 @@ public class RegistroController {
 		}
 	}
 
+	@PostMapping(path = "/listar/tipo")
+	public List<RegistroDto> getListaRegistros(@RequestBody RegistroTypeJson registroTypeJson) throws Exception {
+		try {
+			
+			List<Registro> registros = registroService.findAllRegistrosPorTipo(registroTypeJson);
+
+			List<RegistroDto> registroDtos = mapperConverter.mapToList(registros, RegistroDto.class);
+
+			return registroDtos;
+		} catch (ErroAoConectarFtpException e) {
+			throw new ErroAoConectarFtpException(e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw e;
+		}
+	}
+
 	@PostMapping(path = "/instituicao/listar")
 	public List<RegistroDto> getListaRegistroInsituicoes(@RequestBody RegistroTypeJson registroTypeJson) throws Exception {
 		try {
 			
-			List<Registro> registros = registroService.findAllRegistoNaoVinculado();
+			List<Registro> registros = registroService.findAllRegistoNaoVinculado(registroTypeJson);
 
 			List<RegistroDto> registroDtos = mapperConverter.mapToList(registros, RegistroDto.class);
 
@@ -198,11 +227,25 @@ public class RegistroController {
 
 	@PostMapping("/vincular")
 	@ResponseStatus(HttpStatus.OK)
-	public void vincular(@RequestBody VincularDto vincularDto) throws Exception {
+	public void vincularPessoa(@RequestBody VincularDto vincularDto) throws Exception {
 		try {
-			pessoaService.vincularRegistroPessoa(vincularDto.getIdp(), vincularDto.getIdr());
+			pessoaService.vincularRegistroPessoa(vincularDto.getIdpessoa(), vincularDto.getIdregistro());
 		} catch (Exception e) {
 			throw e;
+		}
+	}
+
+	@PostMapping("/vincular/boletim")
+	@ResponseStatus(HttpStatus.OK)
+	public ResponseEntity<?> vincularBoletim(@RequestBody VincularRegistroDto vincularRegistroDto, HttpServletResponse response) throws Exception {
+		try {
+			pessoaService.vincularRegistroBoletim(vincularRegistroDto.getIdregistroBoletim(), vincularRegistroDto.getIdregistroInstituicao());
+			return new ResponseEntity<>(HttpStatus.OK);
+		
+		}catch(DataIntegrityViolationException e){
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+		}catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
 		}
 	}
 

@@ -1,6 +1,6 @@
 package br.rn.sesed.sides.api.model.json;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
@@ -18,8 +18,8 @@ public class PessoaJson {
 	
 	private String NomeSocial;
 	
-	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-	public LocalDateTime dataNascimento;
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
+	public LocalDate dataNascimento;
 	
 	private int idadeAproximada;
 

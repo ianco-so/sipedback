@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -16,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.json.RegistroJson;
+import br.rn.sesed.sides.api.model.json.RegistroTypeJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
@@ -27,9 +29,15 @@ import br.rn.sesed.sides.domain.model.Registro;
 import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.repository.PessoaRepository;
 import br.rn.sesed.sides.domain.repository.RegistroRepository;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class RegistroService {
+
+	private InputStream isFotoPrincipal = null;
+	private InputStream isSegundaFoto = null;
+	private InputStream isTerceiraFoto = null;
 
 	@Autowired
 	private PessoaRepository pessoaRepository;
@@ -56,15 +64,23 @@ public class RegistroService {
 	private RegistroDtoConvert registroDtoConvert;
 
 	@Transactional
-	public Registro salvar(MultipartFile[] files, String registro) throws IOException {
+	public Registro salvar(MultipartFile[] files, String registro) throws Exception {
 		try {
 			ftpService.status();
-
+			
 			RegistroJson registroJson = registroJsonConvert.toJsonObject(registro);
 
 			Usuario usuario = usuarioService.localizarUsuarioPorCpf(registroJson.getCpfUsuario());
 
 			Pessoa pessoa = pessoaJsonConvert.toDomainObject(registroJson.getPessoa());
+
+			if(pessoa.getNome() != null && pessoa.getNome().isEmpty()){
+				if(pessoa.getNomeSocial() != null){
+					pessoa.setNome(pessoa.getNomeSocial());
+				}
+			}
+
+			this.serializaFotos(files, pessoa);
 
 			Registro registroDesaparecido = registroJsonConvert.toDomainObject(registroJson);
 
@@ -72,6 +88,7 @@ public class RegistroService {
 			registroDesaparecido.setPessoas(new ArrayList<>());
 			registroDesaparecido.getPessoas().add(pessoa);
 
+			
 			Registro registroSalvo = this.salvar(registroDesaparecido);
 			Pessoa pessoaSalva = registroSalvo.getPessoas().get(0);
 
@@ -83,6 +100,7 @@ public class RegistroService {
 						}
 						ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
 								t.getInputStream());
+						
 					}
 				} catch (IOException e) {
 					throw new ErroAoSalvarRegistroException(e.getMessage());
@@ -200,24 +218,24 @@ public class RegistroService {
 	@Transactional
 	public RegistroDto salvar(MultipartFile[] files) {
 		try {
-			Registro reg = new Registro();
-			List<Pessoa> pessoa = new ArrayList<>();
-			reg.setPessoas(pessoa);
-			Registro pessoaSalva = this.salvar(reg);	
+			Registro registro = new Registro();
+			List<Pessoa> pessoas = new ArrayList<>();
+			registro.setPessoas(pessoas);
+			Registro registroSalvo = this.salvar(registro);	
 			Arrays.stream(files).forEach(t -> {
 				try {
 					if (t.getContentType().contains("image")) {
-						if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
-							ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+						if (!ftpService.existDir(String.valueOf(registroSalvo.getId()))) {
+							ftpService.createDir(String.valueOf(registroSalvo.getId()));
 						}
-						ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
+						ftpService.uploadFile(String.valueOf(registroSalvo.getId()) + "/" + String.valueOf(registroSalvo.getId()) + "_" + t.getOriginalFilename(),
 								t.getInputStream());
 					}
 				} catch (IOException e) {
 					throw new ErroAoSalvarRegistroException(e.getMessage());
 				}
 			});	
-			RegistroDto dto = registroDtoConvert.toDto(pessoaSalva);
+			RegistroDto dto = registroDtoConvert.toDto(registroSalvo);
 			return dto;
 		} catch (Exception e) {
 			throw new ErroAoSalvarEntidadeException(e.getMessage());
@@ -282,11 +300,23 @@ public class RegistroService {
 		}
 	}
 
-    public List<Registro> findAllRegistoNaoVinculado() {
+    public List<Registro> findAllRegistoNaoVinculado(RegistroTypeJson registroTypeJson) {
         try {
 
 
 			var registros = registroRepository.findByTipoRegistroAndVinculado(2L, false);
+
+			return registros;
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+    }
+
+	public List<Registro> findAllRegistrosPorTipo(RegistroTypeJson registroTypeJson) {
+        try {
+
+
+			var registros = registroRepository.findByTipoRegistroAndVinculado(registroTypeJson.getTipo().getValue(), registroTypeJson.getVinculado());
 
 			return registros;
 		} catch (Exception e) {
@@ -306,6 +336,41 @@ public class RegistroService {
 		}
     }
 
+	public void serializaFotos(MultipartFile[] files, Pessoa pessoa) throws Exception{
+
+		try{
+		
+			try {
+
+				for (MultipartFile file : files) {
+					byte[] fileBytes = file.getBytes();
+					// log.info("ARQUIVO ->: {}", file.getOriginalFilename());
+					// log.info("FOTO ->: {}", Base64.getEncoder().encodeToString(fileBytes));
+					String teste = "data:image/jpeg;base64,".concat(Base64.getEncoder().encodeToString(fileBytes));
+					if(file.getOriginalFilename() != null && file.getOriginalFilename().contains("fotoprincipal")){
+						pessoa.setStFotoprincipal("data:image/jpeg;base64,".concat(Base64.getEncoder().encodeToString(fileBytes)));
+					}else if(file.getOriginalFilename() != null && file.getOriginalFilename().contains("segundafoto")){
+						pessoa.setStSegundafoto("data:image/jpeg;base64,".concat(Base64.getEncoder().encodeToString(fileBytes)));
+					}else if(file.getOriginalFilename() != null && file.getOriginalFilename().contains("terceirafoto")){
+						pessoa.setStTerceirafoto("data:image/jpeg;base64,".concat(Base64.getEncoder().encodeToString(fileBytes)));
+					}
+										
+				}
+				
+			} catch (IOException e) {
+				throw new ErroAoSalvarRegistroException(e.getMessage());
+			}
+		
+
+
+			
+
+	}catch (Exception e){
+		throw e;
+	}
+	}
+
+	
 
 
 }

@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.Data;
@@ -17,6 +18,7 @@ import lombok.EqualsAndHashCode;
 @Entity(name = "Usuario")
 @Table(name = "usuarios", schema = "dbo")
 @DynamicUpdate
+@DynamicInsert
 public class Usuario {
 
 	@EqualsAndHashCode.Include

@@ -1,6 +1,6 @@
 package br.rn.sesed.sides.domain.model;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 import javax.persistence.Column;
@@ -50,7 +50,7 @@ public class Pessoa {
 	private String nomeSocial;
 
 	@Column(name = "dt_nascimento")
-	private Date dataNascimento;
+	private LocalDate dataNascimento;
 
 	@Column(name = "nu_idadeaproximada")
 	private Integer idadeAproximada;

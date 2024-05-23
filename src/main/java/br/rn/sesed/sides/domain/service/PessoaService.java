@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.api.model.json.PessoaJson;
@@ -14,14 +15,19 @@ import br.rn.sesed.sides.domain.exception.PessoaNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.RegistroNaoEncontradoException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.model.RegistroVinculado;
 import br.rn.sesed.sides.domain.repository.PessoaRepository;
 import br.rn.sesed.sides.domain.repository.RegistroRepository;
+import br.rn.sesed.sides.domain.repository.RegistroVinculadoRepository;
 
 @Service
 public class PessoaService {
 	
 	@Autowired
 	private RegistroRepository registroRepository;
+
+	@Autowired
+	private RegistroVinculadoRepository registroVinculadoRepository;
 
 	@Autowired
 	private PessoaRepository pessoaRepository;
@@ -57,5 +63,38 @@ public class PessoaService {
 			throw e;
 		}
 	}
+
+
+	@Transactional
+	public void vincularRegistroBoletim(Long idRegistroBoletim, Long idRegistroInstituicao) throws Exception {
+		try {
+			
+			Registro registroBoletim = registroRepository.findById(idRegistroBoletim).orElseThrow(() -> new RegistroNaoEncontradoException(idRegistroBoletim));
+			
+			Registro registroInstituicao = registroRepository.findById(idRegistroInstituicao).orElseThrow(() -> new RegistroNaoEncontradoException(idRegistroInstituicao));
+			
+			var registroVinculado = new RegistroVinculado();
+			registroVinculado.setRegistroBoletim(registroBoletim);
+			registroVinculado.setRegistroInstituicao(registroInstituicao);
+
+			registroVinculadoRepository.save(registroVinculado);
+
+			registroBoletim.setVinculado(true);
+			registroInstituicao.setVinculado(true);
+			registroRepository.save(registroBoletim);
+			registroRepository.save(registroInstituicao);
+
+			
+		} catch (IllegalArgumentException ex) {
+			throw new Exception("ID do Registro ou Boletim não pode ser vazio ou nulo");
+		} catch(NoSuchElementException e) {
+			throw new RegistroNaoEncontradoException(idRegistroBoletim);
+		}catch(DataIntegrityViolationException e){
+			throw new DataIntegrityViolationException("Boletins já vincluados anteriormente");
+		}catch(Exception e) {
+			throw e;
+		}
+	}
+
 
 }

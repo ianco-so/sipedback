@@ -1,5 +1,7 @@
 package br.rn.sesed.sides.domain.model;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -13,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -58,13 +61,13 @@ public class Registro {
 	public String delegacia;
 
 	@Column(name = "dt_registro")
-	public Date dataRegistro;
+	public LocalDateTime dataRegistro;
 	
 	@Column(name = "dt_boletim")
-	public Date dataBoletim;
+	public LocalDateTime dataBoletim;
 
 	@Column(name = "dt_desaparecimento")
-	public Date dataDesaparecimento;
+	public LocalDateTime dataDesaparecimento;
 
 	@Column(name = "st_cep")
 	public String cep;
@@ -128,8 +131,14 @@ public class Registro {
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "registro_pessoa", joinColumns = @JoinColumn(name = "ce_registro"), inverseJoinColumns = @JoinColumn(name = "ce_pessoa"))
-	public List<Pessoa> pessoas;
-	
+	public List<Pessoa> pessoas = new ArrayList<>();
+
+	@OneToMany(mappedBy="registroBoletim", fetch = FetchType.LAZY)
+    private List<RegistroVinculado> registrosBoletins = new ArrayList<>();
+
+	@OneToMany(mappedBy="registroInstituicao", fetch = FetchType.LAZY)
+    private List<RegistroVinculado> registrosInstituicoes = new ArrayList<>();;
+
 	@Transient
 	public Pessoa pessoa;
 

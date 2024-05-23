@@ -68,7 +68,22 @@ public class UsuarioService {
 			throw new SidesException(e.getMessage());
 		}
 	}
-		
+
+	public void ativarDesativarUsuario(Long id) {
+        try {
+			if (id != null) {
+				Usuario user = usuarioRepository.findById(id).get();
+				user.setBoAtivo(!user.getBoAtivo());
+				usuarioRepository.save(user);
+			}else {
+				throw new SidesException("O id de usuario não pode ser nulo ou vazio");
+			}
+		}catch (NoSuchElementException e) {
+			throw new UsuarioNaoEncontradoException(id);
+		}catch(Exception e) {
+			throw new SidesException(e.getMessage());
+		}
+    }
 	
 	public Usuario localizarUsuarioPorNome(String usuarioNome) {
 		try {
@@ -161,12 +176,15 @@ public class UsuarioService {
 
 	public List<UsuarioDto> getAllUsers(){
 		try {
-			List<Usuario> ususariosnaovalidados = usuarioRepository.findAllByBoValidado(false);
-			List<UsuarioDto> usersDto = usuarioDtoConvert.toCollectionModel(ususariosnaovalidados);
+			//List<Usuario> ususariosnaovalidados = usuarioRepository.findAllByBoValidado(false);
+			List<Usuario> ususarios = usuarioRepository.findAll();
+			List<UsuarioDto> usersDto = usuarioDtoConvert.toCollectionModel(ususarios);
 			return usersDto;
 		}catch(Exception e) {
 			throw e;
 		}
 	}
+
+
 	
 }

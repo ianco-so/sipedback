@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.domain.model.Registro;
@@ -25,6 +26,7 @@ public class RegistroJsonConvert {
 	}
 	
 	public RegistroJson toJsonObject(String registro) throws JsonMappingException, JsonProcessingException {
+		objectMapper.enable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 		return objectMapper.readValue(registro, RegistroJson.class);
 	}
 	

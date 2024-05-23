@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class VincularDto {
 
-	public Long idr;
-	public Long idp;
+	public Long idregistro;
+	public Long idpessoa;
 	
 }

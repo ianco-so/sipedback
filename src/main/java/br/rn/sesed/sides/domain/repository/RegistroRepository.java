@@ -30,6 +30,8 @@ public interface RegistroRepository extends CustomJpaRepository<Registro, Long>,
 
     public List<Registro> findByTipoRegistroAndVinculado(Long tipoRegistro, boolean vinculado); 
 
+
+
 	
 //	public List<Registro> findByPessoas(List<Pessoa> pessoas);
 	
