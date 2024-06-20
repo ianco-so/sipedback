@@ -1,6 +1,7 @@
-	package br.rn.sesed.sides.domain.service;
+package br.rn.sesed.sides.domain.service;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -27,9 +28,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Service
 public class FTPService {
+
 	private final FTPClientFactory clientFactory;
+
 	@Autowired
 	private FTPProperties properties;
+
 	public FTPService(FTPClientFactory clientFactory) {
 		this.clientFactory = clientFactory;
 	}
@@ -37,21 +41,20 @@ public class FTPService {
 	public void status() {
 		try {
 			FTPClient ftpClient = clientFactory.createClient();
-			if(!ftpClient.sendNoOp()) {
-				throw new ErroAoConectarFtpException("Erro conectando FTP");				
+			if (!ftpClient.sendNoOp()) {
+				throw new ErroAoConectarFtpException("Erro conectando FTP");
 			}
-		}catch (IOException e) {
+		} catch (IOException e) {
 		}
 
 	}
-	
-	
+
 	public Boolean uploadFile(String remoteFilePath, InputStream inputStream) throws IOException {
 		FTPClient ftpClient = clientFactory.createClient();
 		String destination = properties.getRemoteFilePath() + remoteFilePath;
 		try {
-			if(inputStream.available() > 0) {
-				if(!ftpClient.storeFile(destination, inputStream)) {
+			if (inputStream.available() > 0) {
+				if (!ftpClient.storeFile(destination, inputStream)) {
 					throw new ErroAoSalvarFtpException(ftpClient.getReplyString());
 				}
 				return true;
@@ -67,80 +70,169 @@ public class FTPService {
 		ftpClient.changeWorkingDirectory(remoteFilePath);
 		try (OutputStream outputStream = new FileOutputStream(localFile)) {
 			ftpClient.retrieveFile(remoteFilePath, outputStream);
-			
+
 		} finally {
 			ftpClient.disconnect();
 		}
 	}
 
 	public void listDir(String directory) throws IOException {
-    	FTPClient ftpClient = clientFactory.createClient();
-    	ftpClient.changeWorkingDirectory(directory);
-    	FTPFile[] files = ftpClient.listFiles();
-    	for (FTPFile file : files) {
-    		if (file.isFile()) {
-    	}
-    		System.out.println(file.getName());
-    		
-    	}
-    	ftpClient.disconnect();
-    	
-    }
-	
-	public Boolean existDir(String directory) throws IOException {
-    	FTPClient ftpClient = clientFactory.createClient();
-    	ftpClient.changeWorkingDirectory(properties.getRemoteFilePath() + directory);
-        if (ftpClient.getReplyCode() == 550) {
-            return false;
-        }      
-    	ftpClient.disconnect();
-		return true;
-    	
-    }
-	
-	public Boolean createDir(String directory) throws IOException {
-    	FTPClient ftpClient = clientFactory.createClient();
-    	ftpClient.mkd(properties.getRemoteFilePath() + directory);
-        if (ftpClient.getReplyCode() == 550) {
-            return false;
-        }      
-    	ftpClient.disconnect();
-		return true;
-    	
-    }
-	
+		FTPClient ftpClient = clientFactory.createClient();
+		ftpClient.changeWorkingDirectory(directory);
+		FTPFile[] files = ftpClient.listFiles();
+		for (FTPFile file : files) {
+			if (file.isFile()) {
+			}
+			System.out.println(file.getName());
 
-    public List<Foto> getFotosFromRegistroId(String remoteFilePath) throws IOException {
-    	List<Foto> fileList = new ArrayList<>();
-    	List<String> fileNames = new ArrayList<>();
-    	try {
-    		FTPClient ftpClient = clientFactory.createClient();
-    		FTPFile[] files = ftpClient.listFiles(remoteFilePath);
-		        for (FTPFile file : files) {
-		        	fileNames.add(file.getName());
-		        }
-		        if (fileNames.size() > 0) {
-		            for (String filename : fileNames) {
-		                String encodedFile = "";
-		                InputStream is = ftpClient.retrieveFileStream(remoteFilePath+filename);
-		                File file = File.createTempFile("tmp", null);
-		                FileUtils.copyInputStreamToFile(is, file); 
-		                byte[] bytes = new byte[(int) file.length()];
-		                BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
-		                bis.read(bytes, 0, (int) file.length());
-		                bis.close();
-		                encodedFile += new String(Base64.getEncoder().withoutPadding().encode(bytes), "UTF-8");
-		                fileList.add(new Foto(filename, encodedFile));
-		                file.delete();
-		                ftpClient.completePendingCommand();
-		            }
-		        }
-		        ftpClient.disconnect();
+		}
+		ftpClient.disconnect();
+
+	}
+
+	public Boolean existDir(String directory) throws IOException {
+		FTPClient ftpClient = clientFactory.createClient();
+		ftpClient.changeWorkingDirectory(properties.getRemoteFilePath() + directory);
+		if (ftpClient.getReplyCode() == 550) {
+			return false;
+		}
+		ftpClient.disconnect();
+		return true;
+
+	}
+
+	public Boolean createDir(String directory) throws IOException {
+		FTPClient ftpClient = clientFactory.createClient();
+		ftpClient.mkd(properties.getRemoteFilePath() + directory);
+		if (ftpClient.getReplyCode() == 550) {
+			return false;
+		}
+		ftpClient.disconnect();
+		return true;
+
+	}
+
+	public List<Foto> getFotosFromRegistroId(String remoteFilePath) throws IOException {
+		List<Foto> fileList = new ArrayList<>();
+		List<String> fileNames = new ArrayList<>();
+		try {
+			FTPClient ftpClient = clientFactory.createClient();
+			FTPFile[] files = ftpClient.listFiles(remoteFilePath);
+			for (FTPFile file : files) {
+				fileNames.add(file.getName());
+			}
+			if (fileNames.size() > 0) {
+				for (String filename : fileNames) {
+					String encodedFile = "";
+					InputStream is = ftpClient.retrieveFileStream(remoteFilePath + filename);
+					File file = File.createTempFile("tmp", null);
+					FileUtils.copyInputStreamToFile(is, file);
+					byte[] bytes = new byte[(int) file.length()];
+					BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file));
+					bis.read(bytes, 0, (int) file.length());
+					bis.close();
+					encodedFile += new String(Base64.getEncoder().withoutPadding().encode(bytes), "UTF-8");
+					fileList.add(new Foto(filename, encodedFile));
+					file.delete();
+					ftpClient.completePendingCommand();
+				}
+			}
+			ftpClient.disconnect();
 			return fileList;
 		} catch (Exception e) {
 			throw e;
 		}
-    }
+	}
 
-    
+	public byte[] downloadImage(String remoteFilePath) throws IOException {
+
+		FTPClient ftpClient = clientFactory.createClient();
+		byte[] imageBytes = null;
+
+		try {
+
+			ftpClient.enterLocalPassiveMode();
+
+			try {
+
+
+
+				InputStream inputStream = ftpClient.retrieveFileStream(remoteFilePath);
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+				byte[] buffer = new byte[4096];
+				int bytesRead;
+				while ((bytesRead = inputStream.read(buffer)) != -1) {
+					outputStream.write(buffer, 0, bytesRead);
+				}
+				imageBytes = outputStream.toByteArray();
+				if(!ftpClient.completePendingCommand()){
+					throw new Exception("Comando não concluido. ");
+				}
+
+			} catch (Exception e) {
+				throw new IOException(e.getMessage().concat(" Falha recuperando imagem"));
+			}
+		} finally {
+			ftpClient.logout();
+			ftpClient.disconnect();
+		}
+
+		return imageBytes;
+
+	}
+
+
+	public byte[] downloadImageWithoutExtension(String remoteFilePath, String remoteFileName) throws IOException {
+
+		FTPClient ftpClient = clientFactory.createClient();
+		byte[] imageBytes = null;
+		String fileNameWithoutExtension = remoteFileName;
+		try {
+
+			ftpClient.enterLocalPassiveMode();
+
+			try {
+
+				// Lista os arquivos no diretório
+				FTPFile[] files = ftpClient.listFiles(remoteFilePath);
+				// Encontra o arquivo com o nome desejado (ignorando a extensão)
+				String fullFileName = null;
+				for (FTPFile file : files) {
+					if (file.isFile() && file.getName().startsWith(fileNameWithoutExtension)) {
+						fullFileName = file.getName();
+						break;
+					}
+				}
+				
+				if (fullFileName == null) {
+					System.out.println("Arquivo não encontrado.");
+					throw new IOException(" Falha recuperando imagem");
+				}
+
+				InputStream inputStream = ftpClient.retrieveFileStream(remoteFilePath+"/"+fullFileName);
+				ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+				byte[] buffer = new byte[4096];
+				int bytesRead;
+				while ((bytesRead = inputStream.read(buffer)) != -1) {
+					outputStream.write(buffer, 0, bytesRead);
+				}
+				imageBytes = outputStream.toByteArray();
+				if(!ftpClient.completePendingCommand()){
+					throw new Exception("Comando não concluido. ");
+				}
+
+			} catch (Exception e) {
+				throw new IOException(e.getMessage().concat(" Falha recuperando imagem"));
+			}
+		} finally {
+			ftpClient.logout();
+			ftpClient.disconnect();
+		}
+
+		return imageBytes;
+
+	}
+
 }

@@ -2,8 +2,6 @@ package br.rn.sesed.sides.api.model.json;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
@@ -13,6 +11,15 @@ import lombok.Data;
 public class RegistroJson {
 
 	private Long id;
+	
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+	public LocalDateTime dataBoletim;
+	
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+	public LocalDateTime dataRegistro;
+
+	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
+	public LocalDateTime dataDesaparecimento;
 	
 	public String cpfUsuario;
 
@@ -25,15 +32,6 @@ public class RegistroJson {
 	public String boletim;
 
 	public String delegacia;
-
-	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-	public LocalDateTime dataBoletim;
-	
-	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSX")
-	public LocalDateTime dataRegistro;
-
-	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-	public LocalDateTime dataDesaparecimento;
 
 	public String cep;
 
@@ -74,4 +72,10 @@ public class RegistroJson {
 	public String emailComunicante;
 
 	public String relacacoVitima;
+
+	public void setCpfComunicante(String cpfComunicante){
+		if(cpfComunicante != null)
+			this.cpfComunicante = cpfComunicante.replaceAll("\\.|-|/", "");
+	}
+
 }

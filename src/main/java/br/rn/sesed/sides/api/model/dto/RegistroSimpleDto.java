@@ -63,4 +63,5 @@ public class RegistroSimpleDto {
 
 	public String relacaoComVitima;	
 	
+	public String instituicao;
 }

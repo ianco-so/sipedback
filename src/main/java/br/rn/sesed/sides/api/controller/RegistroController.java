@@ -1,5 +1,6 @@
 package br.rn.sesed.sides.api.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,8 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,21 +28,28 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
+import br.rn.sesed.sides.api.model.dto.RegistroVinculadoDto;
 import br.rn.sesed.sides.api.model.dto.VincularDto;
 import br.rn.sesed.sides.api.model.dto.VincularRegistroDto;
+import br.rn.sesed.sides.api.model.json.ImageJson;
 import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.model.json.RegistroJson;
 import br.rn.sesed.sides.api.model.json.RegistroTypeJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
+import br.rn.sesed.sides.api.serialization.RegistroVinculadoDtoConvert;
 import br.rn.sesed.sides.core.modelmapper.ModelMapperConverter;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.model.RegistroVinculado;
+import br.rn.sesed.sides.domain.service.FTPService;
 import br.rn.sesed.sides.domain.service.PessoaService;
 import br.rn.sesed.sides.domain.service.RegistroService;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +61,9 @@ import lombok.extern.slf4j.Slf4j;
 public class RegistroController {
 	
 	@Autowired
+	ObjectMapper objectMapper;
+
+	@Autowired
 	BuildProperties buildProperties;
 	
 	@Autowired
@@ -56,6 +71,9 @@ public class RegistroController {
 
 	@Autowired
 	private PessoaJsonConvert pessoaJsonConvert;
+
+	@Autowired
+	private RegistroVinculadoDtoConvert registroVinculadoDtoConvert;
 
 	@Autowired
 	private RegistroDtoConvert registroDtoConvert;
@@ -66,6 +84,9 @@ public class RegistroController {
 	@Autowired
 	private ModelMapperConverter mapperConverter;
 
+	@Autowired
+    private FTPService ftpService;
+
 	@PostMapping(path = "/novo")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public void adicionar(	@RequestParam(name = "fotos", required = false) MultipartFile[] files,	
@@ -73,7 +94,7 @@ public class RegistroController {
 							HttpServletRequest request) throws Exception {
 		try {
 
-			
+			log.info("Recebendo Json... {}", registro);
 			registro = registro.replace("T00:00:00.000Z", "");
 
 
@@ -125,6 +146,7 @@ public class RegistroController {
 		}
 	
 	}
+
 	@PostMapping("/version")
 	public BuildProperties version(@RequestBody String registroJson) {
 		return buildProperties;
@@ -201,11 +223,32 @@ public class RegistroController {
 	public @ResponseBody RegistroDto localizarRegistro(@PathVariable("id") Long id) {
 		try {
 
-			Registro registro = registroService.localizarPorId(id);
 			
+			Registro registro = registroService.localizarPorId(id);
 			return registroDtoConvert.toDto(registro);
 
 		} catch (Exception e) {
+			e.printStackTrace();
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+	}
+
+	@GetMapping("/boletim-vinculado/{id}")
+	@ResponseStatus(HttpStatus.OK)
+	public @ResponseBody RegistroVinculadoDto localizarRegistroVinculado(@PathVariable("id") Long id) {
+		try {
+
+			var registroBoletim = registroService.localizarPorId(id);
+
+			var registroVinculado = registroService.findRegistroVinculadoByBoletim(id);
+
+			registroVinculado.setRegistroBoletim(registroBoletim);
+			
+			RegistroVinculadoDto rvdto = registroVinculadoDtoConvert.toDto(registroVinculado);
+			return rvdto;
+
+		} catch (Exception e) {
+			e.printStackTrace();
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}
 	}
@@ -249,22 +292,64 @@ public class RegistroController {
 		}
 	}
 
-//	@PostMapping("/pessoa")
-//	@ResponseStatus(HttpStatus.OK)
-//	public @ResponseBody List<RegistroDto> localizarRegistroporPessoa(@RequestBody PessoaJson pessoaJson) {
-//		try {
-//
-//			List<Pessoa> pessoas = new ArrayList<>();
-//			Pessoa pessoa = new Pessoa();
-//			pessoa.setNome(pessoaJson.getNome());
-//			pessoas.add(pessoa);
-//			List<Registro> registros = registroService.localizarPorPessoas(pessoas);
-//
-//			return registroDtoConvert.toCollectionModel(registros);
-//
-//		} catch (Exception e) {
-//			throw new EntidadeNaoEncontradaException(e.getMessage());
-//		}
-//	}
+
+	@PostMapping("/images")
+	@ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<Resource> getImage(@RequestBody ImageJson imageJson) {
+
+		String nomeFoto = String.valueOf(imageJson.getId()).concat("_".concat(imageJson.getImageName()));
+		try {
+			
+			byte[] imageData = ftpService.downloadImageWithoutExtension(String.valueOf(imageJson.getId()), nomeFoto);
+			
+			ByteArrayResource resource = new ByteArrayResource(imageData);
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + nomeFoto);
+	
+			return ResponseEntity.ok()
+					.headers(headers)
+					.contentLength(imageData.length)
+					.contentType(MediaType.IMAGE_JPEG)
+					.body(resource);
+
+		} catch (IOException e) {
+			//return ResponseEntity.notFound().build();
+			return ResponseEntity.ok()
+					.contentLength(0)
+					.contentType(MediaType.APPLICATION_JSON)
+					.body(new ByteArrayResource(new byte[0]));
+		}
+		
+    }
+
+	@GetMapping("/images")
+	public ResponseEntity<Resource> getImage(@RequestParam(name = "imageId") String imageId, @RequestParam(name = "imageName") String imageName) throws IOException {
+
+		String nomeFoto = String.valueOf(imageId.concat("_".concat(imageName)));
+		try {
+			
+			byte[] imageData = ftpService.downloadImageWithoutExtension(String.valueOf(imageId), nomeFoto);
+			
+			ByteArrayResource resource = new ByteArrayResource(imageData);
+			HttpHeaders headers = new HttpHeaders();
+			headers.add(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=" + nomeFoto);
+	
+			return ResponseEntity.ok()
+					.headers(headers)
+					.contentLength(imageData.length)
+					.contentType(MediaType.IMAGE_JPEG)
+					.body(resource);
+
+		} catch (IOException e) {
+			//return ResponseEntity.notFound().build();
+			return ResponseEntity.ok()
+					.contentLength(0)
+					.contentType(MediaType.APPLICATION_JSON)
+					.body(new ByteArrayResource(new byte[0]));
+		}
+		
+	}
+
+
 
 }

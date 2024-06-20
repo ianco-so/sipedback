@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.PostLoad;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -223,13 +224,16 @@ public class Pessoa {
 	@Column(name = "st_marcas")
 	private String marcas;
 
-	@Column(name = "st_fotoprincipal")
+	//@Column(name = "st_fotoprincipal")
+	@Transient
 	private String stFotoprincipal;
 
-	@Column(name = "st_segundafoto")
+	//@Column(name = "st_segundafoto")
+	@Transient
 	private String stSegundafoto;
 
-	@Column(name = "st_terceirafoto")
+	//@Column(name = "st_terceirafoto")
+	@Transient
 	private String stTerceirafoto;
 
 	@Transient
@@ -265,11 +269,16 @@ public class Pessoa {
 	// 		this.stTerceirafoto = terceiraFoto.getContent();
 	// 	}
 	// }
-	// @PostLoad
-	// public void postLoad() {
+	@PostLoad
+	public void postLoad() {
 
-	// 	fotoPrincipal.setContent(this.stFotoprincipal);
-	// 	segundaFoto.setContent(this.stSegundafoto);
-	// 	terceiraFoto.setContent(this.stTerceirafoto);
-	// }
+		this.stFotoprincipal = "images?imageId="+ this.id +"&imageName=fotoprincipal";
+		this.stSegundafoto = "images?imageId="+ this.id +"&imageName=segundafoto";
+		this.stTerceirafoto = "images?imageId="+ this.id +"&imageName=terceirafoto";
+
+
+		// fotoPrincipal.setContent(this.stFotoprincipal);
+		// segundaFoto.setContent(this.stSegundafoto);
+		// terceiraFoto.setContent(this.stTerceirafoto);
+	}
 }

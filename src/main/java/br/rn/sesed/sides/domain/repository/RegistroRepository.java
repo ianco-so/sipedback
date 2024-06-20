@@ -19,6 +19,9 @@ public interface RegistroRepository extends CustomJpaRepository<Registro, Long>,
 	@Query("from Registro r join fetch r.pessoas rp where r.id = :id")
 	public Optional<Registro> findById(@Param("id") Long id);
 
+	@Query("from Registro r left join fetch r.registrosInstituicoes ri where r.id = :id")
+	public Optional<Registro> findBoletimVinculadoById(@Param("id") Long id);
+
 	@Query("from Registro r join fetch r.pessoas rp where r.usuario.cpf = :cpf")
 	public List<Registro> findByCpfComunicante(@Param("cpf") String cpfComunicante);
 	

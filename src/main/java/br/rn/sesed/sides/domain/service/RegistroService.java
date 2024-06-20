@@ -26,9 +26,11 @@ import br.rn.sesed.sides.domain.exception.ErroAoSalvarEntidadeException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
 import br.rn.sesed.sides.domain.model.Pessoa;
 import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.model.RegistroVinculado;
 import br.rn.sesed.sides.domain.model.Usuario;
 import br.rn.sesed.sides.domain.repository.PessoaRepository;
 import br.rn.sesed.sides.domain.repository.RegistroRepository;
+import br.rn.sesed.sides.domain.repository.RegistroVinculadoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -44,7 +46,10 @@ public class RegistroService {
 
 	@Autowired
 	private RegistroRepository registroRepository;
-
+	
+	@Autowired
+	private RegistroVinculadoRepository registroVinculadoRepository;
+	
 	@Autowired
 	private PessoaService pessoaService;
 
@@ -179,28 +184,10 @@ public class RegistroService {
 				isFoto);
 			}
 
-			// Arrays.stream(files).forEach(t -> {
-			// 	try {
-			// 		if (t.getContentType().contains("image")) {
-			// 			if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
-			// 				ftpService.createDir(String.valueOf(pessoaSalva.getId()));
-			// 			}
-			// 			ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
-			// 					t.getInputStream());
-			// 		}
-			// 	} catch (IOException e) {
-			// 		throw new ErroAoSalvarRegistroException(e.getMessage());
-			// 	}
-			// });
-
 			return registroSalvo;
 		} catch (Exception e) {
 			throw e;
 		}
-	}
-
-	private void saveFtp(){
-		
 	}
 
 	@Transactional
@@ -262,16 +249,24 @@ public class RegistroService {
 	public Registro localizarPorId(Long id) {
 
 		try {
-			ftpService.listDir("/");
 			Registro reg = registroRepository.findById(id).get();
-			for(Pessoa pessoa: reg.getPessoas()) {
-				pessoa.setFotos(ftpService.getFotosFromRegistroId("/"+pessoa.getId()+"/"));
-			}
 			return reg;
 		} catch (Exception e) {
 			throw new EntidadeNaoEncontradaException(e.getMessage());
 		}
 	}
+
+	public Registro localizarBoletimVinculadoPorId(Long id) {
+
+		try {
+			Registro reg = registroRepository.findBoletimVinculadoById(id).get();
+			return reg;
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+	}
+
+
 
 	public List<Registro> findByPessoa(Pessoa pessoa) {
 		try {
@@ -336,6 +331,21 @@ public class RegistroService {
 		}
     }
 
+	public RegistroVinculado findRegistroVinculadoByBoletim(Long idBoletim){
+		try {
+
+			
+			var boletimVinculado = registroVinculadoRepository.findById(idBoletim);
+
+			return boletimVinculado.get();
+		} catch (Exception e) {
+			throw new EntidadeNaoEncontradaException(e.getMessage());
+		}
+
+
+
+	}
+
 	public void serializaFotos(MultipartFile[] files, Pessoa pessoa) throws Exception{
 
 		try{
@@ -344,8 +354,6 @@ public class RegistroService {
 
 				for (MultipartFile file : files) {
 					byte[] fileBytes = file.getBytes();
-					// log.info("ARQUIVO ->: {}", file.getOriginalFilename());
-					// log.info("FOTO ->: {}", Base64.getEncoder().encodeToString(fileBytes));
 					String teste = "data:image/jpeg;base64,".concat(Base64.getEncoder().encodeToString(fileBytes));
 					if(file.getOriginalFilename() != null && file.getOriginalFilename().contains("fotoprincipal")){
 						pessoa.setStFotoprincipal("data:image/jpeg;base64,".concat(Base64.getEncoder().encodeToString(fileBytes)));

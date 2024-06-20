@@ -1,15 +1,18 @@
 package br.rn.sesed.sides.api.model.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
+import br.rn.sesed.sides.domain.model.Registro;
 import lombok.Data;
 
 @Data
-public class RegistroDto {
+public class BoletimVinculadoDto {
+
 
 	public Long id;
 
@@ -28,9 +31,6 @@ public class RegistroDto {
 	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
 	public LocalDateTime dataBoletim;
 	
-	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
-	public LocalDateTime dataRegistro;
-
 	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm")
 	public LocalDateTime dataDesaparecimento;
 
@@ -74,9 +74,9 @@ public class RegistroDto {
 
 	public String relacaoComVitima;
 
-	public String instituicao;
-
 	public List<PessoaDto> pessoas;
+
+    private List<RegistroDto> registrosInstituicoes;
 	
 	
 }

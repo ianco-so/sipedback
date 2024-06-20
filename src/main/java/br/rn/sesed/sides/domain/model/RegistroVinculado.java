@@ -25,23 +25,21 @@ import lombok.EqualsAndHashCode;
 @DynamicUpdate
 @DynamicInsert
 public class RegistroVinculado {
-@EqualsAndHashCode.Include
-	
+    @EqualsAndHashCode.Include
+
     @Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	public Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    public Long id;
 
     @Column(name = "dt_vinculacao")
     private LocalDateTime dataVinculacao;
- 
+
     @ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_registro_boletim")
+    @JoinColumn(name = "id_registro_boletim")
     private Registro registroBoletim;
 
     @ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_registro_instituicao")
+    @JoinColumn(name = "id_registro_instituicao")
     private Registro registroInstituicao;
-
-
 
 }

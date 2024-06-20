@@ -30,11 +30,11 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 //@NamedEntityGraph(name = "Registro.pessoasDetail", attributeNodes = @NamedAttributeNode("pessoas")) //Necessário para os Fetch no atributo pessoas
-@Entity(name = "Registro")
+@Entity(name = "BoletimVinculado")
 @Table(name = "registros", schema = "dbo")
 @DynamicUpdate
 @DynamicInsert
-public class Registro {
+public class BoletimVinculado {
 
 	@EqualsAndHashCode.Include
 	@Id
@@ -130,9 +130,6 @@ public class Registro {
 	@Column(name = "st_relacaocomvitima")
 	public String relacaoComVitima;
 
-	@Column(name = "st_instituicao")
-	public String instituicao;
-
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "registro_pessoa", joinColumns = @JoinColumn(name = "ce_registro"), inverseJoinColumns = @JoinColumn(name = "ce_pessoa"))
 	public List<Pessoa> pessoas = new ArrayList<>();
@@ -140,9 +137,12 @@ public class Registro {
 	@OneToMany(mappedBy="registroBoletim", fetch = FetchType.LAZY)
     private List<RegistroVinculado> registrosBoletins = new ArrayList<>();
 
-	@OneToMany(mappedBy="registroInstituicao", fetch = FetchType.LAZY)
-    private List<RegistroVinculado> registrosInstituicoes = new ArrayList<>();;
-
+	@OneToMany(mappedBy="registroInstituicao", fetch = FetchType.EAGER)
+    private List<RegistroVinculado> registrosInstituicoes = new ArrayList<>();
+	
+	@Column(name = "st_instituicao")
+	public String instituicao;
+	
 	@Transient
 	public Pessoa pessoa;
 
@@ -154,11 +154,11 @@ public class Registro {
 			this.pessoa = pessoas.get(0);
 		}
 	}
-
+	
 	@PrePersist
 	public void onPersiste(){
 
-		if(usuario != null && this.instituicao.isEmpty()){
+		if(usuario != null){
 			this.setInstituicao(usuario.getInstituicao());
 		}
 

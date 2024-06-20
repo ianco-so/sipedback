@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class PessoaJson {
 
+	private Long id;
+
 	private String nome;
 	
 	private String identidadeGenero;
@@ -21,6 +23,8 @@ public class PessoaJson {
 	@JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd")
 	public LocalDate dataNascimento;
 	
+	private String acessorios;
+
 	private int idadeAproximada;
 
 	private String rg;
@@ -77,7 +81,7 @@ public class PessoaJson {
 
 	private String corteCabelo;
 
-	private String acessorios;
+
 
 	private Boolean boDeficiente;
 
@@ -146,4 +150,9 @@ public class PessoaJson {
 	private FileBase64 segundaFoto;
 	
 	private FileBase64 terceiraFoto;
+
+	public void setCpf(String cpf){
+		if(cpf != null)
+			this.cpf = cpf.replaceAll("\\.|-|/", "");
+	}
 }
