@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Repository;
 
 import br.rn.sesed.sides.domain.desaparecidos.model.BoletimVinculado;
@@ -15,7 +16,7 @@ public interface BoletimVinculadoRepository extends CustomJpaRepository<BoletimV
 
 
 	@Query("from BoletimVinculado bv right join fetch bv.registrosBoletins where bv.id = :id")
-	Optional<BoletimVinculado> findById(Long id);
+	Optional<BoletimVinculado> findById(@NonNull Long id);
 
 	
 }
