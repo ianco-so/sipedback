@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.rn.sesed.sides.api.model.dto.BoletimVinculadoDto;
-import br.rn.sesed.sides.domain.model.BoletimVinculado;
+import br.rn.sesed.sides.domain.desaparecidos.model.BoletimVinculado;
 
 @Component
 public class BoletimVinculadoDtoConvert {

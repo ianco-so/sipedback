@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.model;
+package br.rn.sesed.sides.domain.desaparecidos.model;
 
 import org.springframework.stereotype.Component;
 

@@ -1,25 +1,36 @@
-package br.rn.sesed.sides.domain.service;
+package br.rn.sesed.sides.domain.desaparecidos.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring5.SpringTemplateEngine;
 
 import br.rn.sesed.sides.api.model.dto.UsuarioDto;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
+import br.rn.sesed.sides.core.generator.RandomStringGeneratorService;
 import br.rn.sesed.sides.core.security.Encrypt;
 import br.rn.sesed.sides.core.security.GenerateToken;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.repository.UsuarioRepository;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoValidado;
-import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.repository.UsuarioRepository;
+import br.rn.sesed.sides.domain.rotafx.model.Notificacao;
+import br.rn.sesed.sides.domain.rotafx.service.NotificacaoService;
 import br.rn.sesed.sides.exception.SidesException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class UsuarioService {
 
@@ -29,9 +40,17 @@ public class UsuarioService {
 	@Autowired
 	private GenerateToken generateToken;
 	
+	@Autowired
+	private RandomStringGeneratorService stringGeneratorService;
+
+	@Autowired
+	private NotificacaoService notificacaoService;
 	
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+
+	@Autowired
+    private SpringTemplateEngine templateEngine;
 	
 	public UsuarioDto autenticarUsuario(UsuarioLoginJson usuarioJson) {
 		try {
@@ -139,10 +158,45 @@ public class UsuarioService {
 		}
 	}
 
+	@Transactional
+	public Usuario atualizar(Usuario usuario) {
+		return usuarioRepository.save(usuario);
+	}
+
 
 	public Boolean recupararSenha(String cpf) {
-		try {		
-			if(usuarioRepository.findByCpf(cpf).isPresent()) {			
+		try {	
+			
+			Optional<Usuario> usuario = usuarioRepository.findByCpf(cpf);
+
+
+			if(usuario.isPresent()) {	
+				
+				
+
+
+				var novaSenha = stringGeneratorService.generateRandomString();
+
+				usuario.get().setSenha(Encrypt.getMD5(novaSenha));
+
+				this.atualizar(usuario.get());
+
+				Map<String, Object> templateModel = new HashMap<>();
+				Context context = new Context();
+				context.setVariables(templateModel);
+				String htmlTemplate = templateEngine.process("emailTemplate", context);
+				htmlTemplate = htmlTemplate.replace("*senha*", novaSenha);
+
+				var notificacao = new Notificacao();
+				notificacao.setPessoaDestino(cpf);
+				notificacao.setDestino(usuario.get().getEmail());
+				notificacao.setOrigem("SIPED");
+				notificacao.setPlataformaEnvio("EMAIL");
+				notificacao.setTipo("RecuperarSenha");
+				notificacao.setTitulo("Recuperação de Senha");
+				notificacao.setCorpo(htmlTemplate);
+				notificacaoService.save(notificacao);
+
 				return true;
 			}
 			

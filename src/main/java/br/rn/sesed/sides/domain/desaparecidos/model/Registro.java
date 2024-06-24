@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.model;
+package br.rn.sesed.sides.domain.desaparecidos.model;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -153,16 +153,6 @@ public class Registro {
 			this.nomeSocial = pessoas.get(0).getNomeSocial();
 			this.pessoa = pessoas.get(0);
 		}
-	}
-
-	@PrePersist
-	public void onPersiste(){
-
-		if(usuario != null && this.instituicao.isEmpty()){
-			this.setInstituicao(usuario.getInstituicao());
-		}
-
-
 	}
 	
 }

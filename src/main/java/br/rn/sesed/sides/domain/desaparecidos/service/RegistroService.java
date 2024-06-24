@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.service;
+package br.rn.sesed.sides.domain.desaparecidos.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -21,16 +21,16 @@ import br.rn.sesed.sides.api.model.json.RegistroTypeJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroJsonConvert;
+import br.rn.sesed.sides.domain.desaparecidos.model.Pessoa;
+import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
+import br.rn.sesed.sides.domain.desaparecidos.model.RegistroVinculado;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.repository.PessoaRepository;
+import br.rn.sesed.sides.domain.desaparecidos.repository.RegistroRepository;
+import br.rn.sesed.sides.domain.desaparecidos.repository.RegistroVinculadoRepository;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarEntidadeException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarRegistroException;
-import br.rn.sesed.sides.domain.model.Pessoa;
-import br.rn.sesed.sides.domain.model.Registro;
-import br.rn.sesed.sides.domain.model.RegistroVinculado;
-import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.repository.PessoaRepository;
-import br.rn.sesed.sides.domain.repository.RegistroRepository;
-import br.rn.sesed.sides.domain.repository.RegistroVinculadoRepository;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -84,8 +84,9 @@ public class RegistroService {
 					pessoa.setNome(pessoa.getNomeSocial());
 				}
 			}
-
-			this.serializaFotos(files, pessoa);
+			if(files != null){
+				this.serializaFotos(files, pessoa);
+			}
 
 			Registro registroDesaparecido = registroJsonConvert.toDomainObject(registroJson);
 
@@ -97,20 +98,22 @@ public class RegistroService {
 			Registro registroSalvo = this.salvar(registroDesaparecido);
 			Pessoa pessoaSalva = registroSalvo.getPessoas().get(0);
 
-			Arrays.stream(files).forEach(t -> {
-				try {
-					if (t.getContentType().contains("image")) {
-						if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
-							ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+			if(files != null){
+				Arrays.stream(files).forEach(t -> {
+					try {
+						if (t.getContentType().contains("image")) {
+							if (!ftpService.existDir(String.valueOf(pessoaSalva.getId()))) {
+								ftpService.createDir(String.valueOf(pessoaSalva.getId()));
+							}
+							ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
+									t.getInputStream());
+							
 						}
-						ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + t.getOriginalFilename(),
-								t.getInputStream());
-						
+					} catch (IOException e) {
+						throw new ErroAoSalvarRegistroException(e.getMessage());
 					}
-				} catch (IOException e) {
-					throw new ErroAoSalvarRegistroException(e.getMessage());
-				}
-			});
+				});
+			}
 
 			return registroSalvo;
 		} catch (Exception e) {
@@ -198,6 +201,7 @@ public class RegistroService {
 			registro.getPessoas().add(pessoa);
 			return registroRepository.save(registro);
 		} catch (Exception e) {
+			e.printStackTrace();
 			throw new ErroAoSalvarEntidadeException(e.getMessage());
 		}
 	}

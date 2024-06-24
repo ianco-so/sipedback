@@ -19,11 +19,11 @@ import br.rn.sesed.sides.api.model.json.UsuarioJson;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.service.UsuarioService;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.exception.UsuarioNaoEncontradoException;
-import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.service.UsuarioService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
@@ -144,39 +144,5 @@ public class UsuarioController {
 		}
 	}
 	
-	
-	
-//	@Security
-//	@GetMapping("/usuario/recuperar/id/{id}")
-//	public @ResponseBody UsuarioDto recuperarUsuarioPeloId(@PathVariable("id") Long id, @Context HttpServletRequest request, @Context SecurityContext secContext) {
-//		try {
-//			Usuario usuario = usuarioService.localizarUsuarioPorId(id);
-//			return usuarioDtoConvert.toDto(usuario);
-//		} catch (Exception e) {
-//			throw new UsuarioNaoEncontradoException(id);
-//		}
-//	}
-//	
-//	@Security
-//	@GetMapping("/usuario/recuperar/nome/{nome}")
-//	public UsuarioDto recuperarUsuarioPeloNome(@PathVariable("nome") String nome) {
-//		try {
-//			Usuario usuario = usuarioService.localizarUsuarioPorNome(nome);
-//			return usuarioDtoConvert.toDto(usuario);
-//		} catch (Exception e) {
-//			throw new UsuarioNaoEncontradoException("nome",nome);
-//		}
-//	}
-
-//	@Security
-//	@GetMapping("/usuario/deletar/{id}")
-//	@ResponseStatus(HttpStatus.OK)
-//	public void deletarUsuario(Long id) {
-//		try {
-//			// usuarioService.deletar(id);
-//		} catch (Exception e) {
-//			throw new ErroAoDeletarUsuarioException(id);
-//		}
-//	}
 
 }

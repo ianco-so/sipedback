@@ -1,3 +1,4 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.jdt.ls.vmargs": "-Xms1G -Xmx4G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=1G"
 }

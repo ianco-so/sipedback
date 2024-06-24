@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.repository;
+package br.rn.sesed.sides.domain.desaparecidos.repository;
 
 import java.util.Optional;
 
@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import br.rn.sesed.sides.domain.model.BoletimVinculado;
+import br.rn.sesed.sides.domain.desaparecidos.model.BoletimVinculado;
 
 
 

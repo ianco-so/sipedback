@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.rn.sesed.sides.api.model.dto.RegistroVinculadoDto;
-import br.rn.sesed.sides.domain.model.RegistroVinculado;
+import br.rn.sesed.sides.domain.desaparecidos.model.RegistroVinculado;
 
 @Component
 public class RegistroVinculadoDtoConvert {

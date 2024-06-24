@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 
 import br.rn.sesed.sides.api.model.dto.RegistroDto;
 import br.rn.sesed.sides.api.model.dto.RegistroSimpleDto;
-import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
 
 @Component
 public class RegistroDtoConvert {

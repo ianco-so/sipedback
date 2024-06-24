@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.repository;
+package br.rn.sesed.sides.domain.desaparecidos.repository;
 
 import java.util.List;
 import java.util.Optional;
@@ -9,7 +9,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
 
 @Repository
 public interface RegistroRepository extends CustomJpaRepository<Registro, Long>, JpaSpecificationExecutor<Registro>,

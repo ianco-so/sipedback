@@ -1,13 +1,11 @@
 package br.rn.sesed.sides.api.model.dto;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
 
-import br.rn.sesed.sides.domain.model.Registro;
 import lombok.Data;
 
 @Data

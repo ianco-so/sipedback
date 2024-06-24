@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import br.rn.sesed.sides.api.model.json.UsuarioJson;
-import br.rn.sesed.sides.domain.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
 
 @Component
 public class UsuarioJsonConvert {

@@ -43,15 +43,14 @@ import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroVinculadoDtoConvert;
 import br.rn.sesed.sides.core.modelmapper.ModelMapperConverter;
+import br.rn.sesed.sides.domain.desaparecidos.model.Pessoa;
+import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
+import br.rn.sesed.sides.domain.desaparecidos.service.FTPService;
+import br.rn.sesed.sides.domain.desaparecidos.service.PessoaService;
+import br.rn.sesed.sides.domain.desaparecidos.service.RegistroService;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
-import br.rn.sesed.sides.domain.model.Pessoa;
-import br.rn.sesed.sides.domain.model.Registro;
-import br.rn.sesed.sides.domain.model.RegistroVinculado;
-import br.rn.sesed.sides.domain.service.FTPService;
-import br.rn.sesed.sides.domain.service.PessoaService;
-import br.rn.sesed.sides.domain.service.RegistroService;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -95,14 +94,16 @@ public class RegistroController {
 		try {
 
 			log.info("Recebendo Json... {}", registro);
-			registro = registro.replace("T00:00:00.000Z", "");
+			// registro = registro.replace("T00:00:00.000Z", "");
 
+			// registro = "{\"bairro\":\"\",\"boletim\":\"\",\"cep\":\"\",\"complemento\":\"\",\"cpfComunicante\":\"\",\"cpfUsuario\":\"06760369459\",\"dataBoletim\":\"\",\"dataDesaparecimento\":\"\",\"delegacia\":\"\",\"detalhes\":\"\",\"emailComunicante\":\"\",\"lat\":\"\",\"logradouro\":\"\",\"lon\":\"\",\"municipio\":\"\",\"nomeComunicante\":\"\",\"nomeSocialComunicante\":\"\",\"numero\":\"\",\"pessoa\":{\"acessorios\":\"\",\"altura\":\"\",\"bairro\":\"\",\"biotipo\":\"\",\"boAparelhoAuditivo\":false,\"boAuditiva\":false,\"boCadeirante\":false,\"boComorbidade\":false,\"boDeficiente\":false,\"boDividasAgiotas\":false,\"boDividasNarcotraficantes\":false,\"boFisica\":false,\"boHistoricoDesaparecimento\":false,\"boInstituicaoEnsino\":false,\"boIntelectual\":false,\"boInteracaosocial\":false,\"boLibras\":false,\"boMemoria\":false,\"boMuleta\":false,\"boNeuroDesenvolvimento\":false,\"boNomeSocial\":false,\"boSenil\":false,\"boVisual\":false,\"cabelo\":\"\",\"celular\":\"\",\"comorbidade\":\"\",\"complemento\":\"\",\"corCabelo\":\"\",\"corOlhos\":\"\",\"corPele\":\"\",\"corteCabelo\":\"\",\"cpf\":\"\",\"dataNascimento\":\"1212-12-12\",\"drogas\":\"\",\"escolaridade\":\"\",\"estadoPsiquico\":\"\",\"fisica\":\"\",\"idadeAproximada\":12,\"identidadeGenero\":\"homem\",\"instituicaoEnsino\":\"\",\"intelectual\":\"\",\"interacaosocial\":\"\",\"logradouro\":\"\",\"mae\":\"\",\"marcas\":\"\",\"medicacao\":\"\",\"memoria\":\"\",\"municipio\":\"\",\"nacionalidade\":\"\",\"naturalidade\":\"\",\"neuroDesenvolvimento\":\"\",\"nome\":\"\",\"nomeSocial\":\"Teste - William \",\"numero\":\"\",\"orgaoEmissorRg\":\"\",\"pai\":\"\",\"rg\":\"\",\"situacaoEconomica\":\"\",\"tipoSanguineo\":\"a+\",\"uf\":\"\",\"ufNaturalidade\":\"\",\"ufrg\":\"\"},\"pontoReferencia\":\"\",\"relacacoVitima\":\"\",\"rgComunicante\":\"\",\"rgOrgaoEmissorComunicante\":\"\",\"telefoneComunicante\":\"\",\"tipoRegistro\":2,\"uf\":\"\",\"ufRgComunicante\":\"\"}";
 
 			log.info("Registrando... {}", registro);
 			registroService.salvar(files,registro);						
 		} catch (ErroAoConectarFtpException e) {
 			throw new ErroAoConectarFtpException(e.getMessage());
 		} catch (Exception e) {
+			log.error("Erro salvando registro: ", e.getCause());
 			throw e;
 		}
 	}

@@ -1,0 +1,19 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Run WildFly",
+            "type": "shell",
+            "command": "/home/emiliano/wildfly/wildfly-17.0.1.Final/bin/standalone.sh",
+            "args": [],
+            "options": {
+                "env": {
+                    "JAVA_OPTS": "-Xms1024m -Xmx2048m -XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m"
+                }
+            },
+            "problemMatcher": []
+        }
+    ]
+}

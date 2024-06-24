@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.api.model.dto.UsuarioDto;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
-import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.repository.UsuarioRepository;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.repository.UsuarioRepository;
 import br.sesed.authentication.security.ActiveDirectory;
 import br.sesed.authentication.security.User;
 import lombok.extern.slf4j.Slf4j;

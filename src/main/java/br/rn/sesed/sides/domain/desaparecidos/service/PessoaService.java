@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.service;
+package br.rn.sesed.sides.domain.desaparecidos.service;
 
 import java.util.NoSuchElementException;
 
@@ -10,15 +10,15 @@ import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.api.model.json.PessoaJson;
 import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
+import br.rn.sesed.sides.domain.desaparecidos.model.Pessoa;
+import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
+import br.rn.sesed.sides.domain.desaparecidos.model.RegistroVinculado;
+import br.rn.sesed.sides.domain.desaparecidos.repository.PessoaRepository;
+import br.rn.sesed.sides.domain.desaparecidos.repository.RegistroRepository;
+import br.rn.sesed.sides.domain.desaparecidos.repository.RegistroVinculadoRepository;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import br.rn.sesed.sides.domain.exception.PessoaNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.RegistroNaoEncontradoException;
-import br.rn.sesed.sides.domain.model.Pessoa;
-import br.rn.sesed.sides.domain.model.Registro;
-import br.rn.sesed.sides.domain.model.RegistroVinculado;
-import br.rn.sesed.sides.domain.repository.PessoaRepository;
-import br.rn.sesed.sides.domain.repository.RegistroRepository;
-import br.rn.sesed.sides.domain.repository.RegistroVinculadoRepository;
 
 @Service
 public class PessoaService {

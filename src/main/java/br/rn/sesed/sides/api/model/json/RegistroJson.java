@@ -72,6 +72,8 @@ public class RegistroJson {
 	public String emailComunicante;
 
 	public String relacacoVitima;
+	
+	public String instituicao;
 
 	public void setCpfComunicante(String cpfComunicante){
 		if(cpfComunicante != null)

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import br.rn.sesed.sides.api.model.json.RegistroJson;
-import br.rn.sesed.sides.domain.model.Registro;
+import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
 
 @Component
 public class RegistroJsonConvert {

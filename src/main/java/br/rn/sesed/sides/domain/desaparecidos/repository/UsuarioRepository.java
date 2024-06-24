@@ -1,11 +1,11 @@
-package br.rn.sesed.sides.domain.repository;
+package br.rn.sesed.sides.domain.desaparecidos.repository;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Repository;
 
-import br.rn.sesed.sides.domain.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
 
 @Repository
 public interface UsuarioRepository extends CustomJpaRepository<Usuario, Long> {

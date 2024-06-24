@@ -1,4 +1,4 @@
-package br.rn.sesed.sides.domain.service;
+package br.rn.sesed.sides.domain.desaparecidos.service;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,9 +20,9 @@ import org.springframework.stereotype.Service;
 
 import br.rn.sesed.sides.core.ftp.FTPClientFactory;
 import br.rn.sesed.sides.core.ftp.FTPProperties;
+import br.rn.sesed.sides.domain.desaparecidos.model.Foto;
 import br.rn.sesed.sides.domain.exception.ErroAoConectarFtpException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarFtpException;
-import br.rn.sesed.sides.domain.model.Foto;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

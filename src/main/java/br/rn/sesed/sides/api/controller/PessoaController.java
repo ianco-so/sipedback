@@ -13,9 +13,9 @@ import br.rn.sesed.sides.api.model.dto.UsuarioDto;
 import br.rn.sesed.sides.api.model.json.UsuarioJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.service.UsuarioService;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
-import br.rn.sesed.sides.domain.model.Usuario;
-import br.rn.sesed.sides.domain.service.UsuarioService;
 
 @RestController
 @RequestMapping("/pessoa")
