@@ -15,7 +15,6 @@ public class FTPConfig {
 //	
 //	@Bean
 //	public void list() throws IOException {
-//		log.info("--------------> Iniciando FTP");
 //		try {
 //			
 //		

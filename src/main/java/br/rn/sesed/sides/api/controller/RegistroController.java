@@ -43,6 +43,7 @@ import br.rn.sesed.sides.api.serialization.PessoaJsonConvert;
 import br.rn.sesed.sides.api.serialization.RegistroDtoConvert;
 import br.rn.sesed.sides.api.serialization.RegistroVinculadoDtoConvert;
 import br.rn.sesed.sides.core.modelmapper.ModelMapperConverter;
+import br.rn.sesed.sides.core.security.annotation.Security;
 import br.rn.sesed.sides.domain.desaparecidos.model.Pessoa;
 import br.rn.sesed.sides.domain.desaparecidos.model.Registro;
 import br.rn.sesed.sides.domain.desaparecidos.service.FTPService;
@@ -86,19 +87,15 @@ public class RegistroController {
 	@Autowired
     private FTPService ftpService;
 
+	@Security
 	@PostMapping(path = "/novo")
 	@ResponseStatus(code = HttpStatus.CREATED)
 	public void adicionar(	@RequestParam(name = "fotos", required = false) MultipartFile[] files,	
 							@RequestPart(name = "registro", required = false) String registro,
 							HttpServletRequest request) throws Exception {
 		try {
-
-			log.info("Recebendo Json... {}", registro);
-			// registro = registro.replace("T00:00:00.000Z", "");
-
-			// registro = "{\"bairro\":\"\",\"boletim\":\"\",\"cep\":\"\",\"complemento\":\"\",\"cpfComunicante\":\"\",\"cpfUsuario\":\"06760369459\",\"dataBoletim\":\"\",\"dataDesaparecimento\":\"\",\"delegacia\":\"\",\"detalhes\":\"\",\"emailComunicante\":\"\",\"lat\":\"\",\"logradouro\":\"\",\"lon\":\"\",\"municipio\":\"\",\"nomeComunicante\":\"\",\"nomeSocialComunicante\":\"\",\"numero\":\"\",\"pessoa\":{\"acessorios\":\"\",\"altura\":\"\",\"bairro\":\"\",\"biotipo\":\"\",\"boAparelhoAuditivo\":false,\"boAuditiva\":false,\"boCadeirante\":false,\"boComorbidade\":false,\"boDeficiente\":false,\"boDividasAgiotas\":false,\"boDividasNarcotraficantes\":false,\"boFisica\":false,\"boHistoricoDesaparecimento\":false,\"boInstituicaoEnsino\":false,\"boIntelectual\":false,\"boInteracaosocial\":false,\"boLibras\":false,\"boMemoria\":false,\"boMuleta\":false,\"boNeuroDesenvolvimento\":false,\"boNomeSocial\":false,\"boSenil\":false,\"boVisual\":false,\"cabelo\":\"\",\"celular\":\"\",\"comorbidade\":\"\",\"complemento\":\"\",\"corCabelo\":\"\",\"corOlhos\":\"\",\"corPele\":\"\",\"corteCabelo\":\"\",\"cpf\":\"\",\"dataNascimento\":\"1212-12-12\",\"drogas\":\"\",\"escolaridade\":\"\",\"estadoPsiquico\":\"\",\"fisica\":\"\",\"idadeAproximada\":12,\"identidadeGenero\":\"homem\",\"instituicaoEnsino\":\"\",\"intelectual\":\"\",\"interacaosocial\":\"\",\"logradouro\":\"\",\"mae\":\"\",\"marcas\":\"\",\"medicacao\":\"\",\"memoria\":\"\",\"municipio\":\"\",\"nacionalidade\":\"\",\"naturalidade\":\"\",\"neuroDesenvolvimento\":\"\",\"nome\":\"\",\"nomeSocial\":\"Teste - William \",\"numero\":\"\",\"orgaoEmissorRg\":\"\",\"pai\":\"\",\"rg\":\"\",\"situacaoEconomica\":\"\",\"tipoSanguineo\":\"a+\",\"uf\":\"\",\"ufNaturalidade\":\"\",\"ufrg\":\"\"},\"pontoReferencia\":\"\",\"relacacoVitima\":\"\",\"rgComunicante\":\"\",\"rgOrgaoEmissorComunicante\":\"\",\"telefoneComunicante\":\"\",\"tipoRegistro\":2,\"uf\":\"\",\"ufRgComunicante\":\"\"}";
-
-			log.info("Registrando... {}", registro);
+			log.debug("Recebendo Json... {}", registro);
+			log.debug("Registrando... {}", registro);
 			registroService.salvar(files,registro);						
 		} catch (ErroAoConectarFtpException e) {
 			throw new ErroAoConectarFtpException(e.getMessage());
@@ -107,7 +104,8 @@ public class RegistroController {
 			throw e;
 		}
 	}
-	
+
+	@Security
 	@GetMapping(path = "/novo/rotafx")
 	public @ResponseBody RegistroDto getNovoRegistro() throws Exception {
 		try {
@@ -127,6 +125,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@PostMapping("/boletim")
 	@ResponseStatus(HttpStatus.CREATED)
 	public @ResponseBody RegistroDto postNovoRegistro(@RequestBody RegistroJson registroJson) throws Exception {
@@ -148,11 +147,13 @@ public class RegistroController {
 	
 	}
 
+	@Security
 	@PostMapping("/version")
 	public BuildProperties version(@RequestBody String registroJson) {
 		return buildProperties;
 	}	
 
+	@Security
 	@PostMapping(path = "/listar")
 	public List<RegistroDto> getListaRegistro() throws Exception {
 		try {
@@ -170,6 +171,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@PostMapping(path = "/listar/tipo")
 	public List<RegistroDto> getListaRegistros(@RequestBody RegistroTypeJson registroTypeJson) throws Exception {
 		try {
@@ -187,6 +189,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@PostMapping(path = "/instituicao/listar")
 	public List<RegistroDto> getListaRegistroInsituicoes(@RequestBody RegistroTypeJson registroTypeJson) throws Exception {
 		try {
@@ -205,6 +208,7 @@ public class RegistroController {
 	}
 
 
+	@Security
 	@GetMapping("/usuario/{cpf}")
 	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody List<RegistroSimpleDto> localizarPorUsuario(@PathVariable("cpf") String cpf) {
@@ -219,6 +223,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@GetMapping("/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody RegistroDto localizarRegistro(@PathVariable("id") Long id) {
@@ -234,6 +239,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@GetMapping("/boletim-vinculado/{id}")
 	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody RegistroVinculadoDto localizarRegistroVinculado(@PathVariable("id") Long id) {
@@ -254,6 +260,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@PostMapping("/pessoa")
 	@ResponseStatus(HttpStatus.OK)
 	public @ResponseBody List<RegistroDto> localizarRegistroPorPessoa(@RequestBody PessoaJson pessoaJson) {
@@ -269,6 +276,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@PostMapping("/vincular")
 	@ResponseStatus(HttpStatus.OK)
 	public void vincularPessoa(@RequestBody VincularDto vincularDto) throws Exception {
@@ -279,6 +287,7 @@ public class RegistroController {
 		}
 	}
 
+	@Security
 	@PostMapping("/vincular/boletim")
 	@ResponseStatus(HttpStatus.OK)
 	public ResponseEntity<?> vincularBoletim(@RequestBody VincularRegistroDto vincularRegistroDto, HttpServletResponse response) throws Exception {
@@ -294,6 +303,7 @@ public class RegistroController {
 	}
 
 
+	@Security
 	@PostMapping("/images")
 	@ResponseStatus(HttpStatus.OK)
     public ResponseEntity<Resource> getImage(@RequestBody ImageJson imageJson) {
@@ -323,6 +333,7 @@ public class RegistroController {
 		
     }
 
+	@Security
 	@GetMapping("/images")
 	public ResponseEntity<Resource> getImage(@RequestParam(name = "imageId") String imageId, @RequestParam(name = "imageName") String imageName) throws IOException {
 

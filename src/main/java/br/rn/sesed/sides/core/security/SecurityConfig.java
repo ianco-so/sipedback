@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 
+//@Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig implements WebSecurityCustomizer {
@@ -23,7 +24,7 @@ public class SecurityConfig implements WebSecurityCustomizer {
 		http
 			.csrf(csrf -> csrf.disable())
 			.authorizeRequests((authorize) -> authorize
-					.antMatchers("/swagger-ui/**", "/v2/api-docs", "/webjars/**", "/swagger-resources/**")
+					.antMatchers("/swagger-ui/**", "/v2/api-docs", "/webjars/**", "/swagger-resources/**", "/usuario/login")
 					.permitAll()
 					.antMatchers("/**").permitAll()
 					.anyRequest().authenticated())

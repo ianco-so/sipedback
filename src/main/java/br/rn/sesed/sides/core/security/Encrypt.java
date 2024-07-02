@@ -9,7 +9,12 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.RandomStringUtils;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class Encrypt {
+
+	private final static String KEY_VALIDATION = "dc98d678b65ac489bb1542713a3151f6c95462a47d51472b3873fa2edabecd104f84066b2db7637e4326622cfc8b7eabdc0cc5cae9e3d10eb450a1dc06563de1";
 
 	public static String getMD5(String str) {
 		
@@ -49,5 +54,16 @@ public class Encrypt {
 	    return password;
 	}
 	
-	
+	public static String generateHash(String str) throws NoSuchAlgorithmException {
+        String payload = str.concat(KEY_VALIDATION);
+        MessageDigest md = MessageDigest.getInstance("SHA-512");
+        byte[] digest = md.digest(payload.getBytes());
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < digest.length; i++) {
+            sb.append(Integer.toString((digest[i] & 0xff) + 0x100, 16).substring(1));
+        }
+
+		log.debug(sb.toString());
+        return sb.toString();
+	}
 }

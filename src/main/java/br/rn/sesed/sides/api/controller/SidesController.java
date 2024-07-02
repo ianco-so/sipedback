@@ -13,7 +13,7 @@ import br.rn.sesed.sides.api.model.dto.UsuarioDto;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.core.ldap.LdapService;
 import br.rn.sesed.sides.core.security.GenerateToken;
-import br.rn.sesed.sides.core.security.Security;
+import br.rn.sesed.sides.core.security.annotation.Security;
 import br.rn.sesed.sides.domain.desaparecidos.service.UsuarioService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -44,9 +44,11 @@ public class SidesController {
 	@Security
 	@GetMapping("/version")
 	public BuildProperties version() {
+		log.debug("Application SIDES Version: {}", buildProperties.getVersion());
 		return buildProperties;
 	}	
 
+	@Security(enabled = false)
 	@PostMapping("/auth")
 	public String login(@RequestBody UsuarioLoginJson usuario) throws Exception {
 		try {

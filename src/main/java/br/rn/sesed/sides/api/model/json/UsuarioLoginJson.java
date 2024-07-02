@@ -7,5 +7,7 @@ public class UsuarioLoginJson{
 	
 	private String cpf;
 	private String senha;	
+	private String code;
+	private String setor;
 	
 }

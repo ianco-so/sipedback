@@ -9,13 +9,10 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
-import java.time.Instant;
 import java.util.Base64;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
-
-import javax.ejb.Stateless;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,8 +22,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
+import lombok.extern.slf4j.Slf4j;
 
-//@Stateless(name = "GenerateToken")
+@Slf4j
 @Component
 public class GenerateToken {
 	
@@ -109,7 +107,7 @@ public class GenerateToken {
     	
         PrivateKey privateKey = this.getPrivateKey();
 
-        Instant now = Instant.now();
+        // Instant now = Instant.now();
         String jwtToken = Jwts.builder()
                 .claim("cpf", cpf)
                 .claim("email", email)
@@ -119,7 +117,7 @@ public class GenerateToken {
                 .setExpiration(expira.getTime())
                 .signWith(privateKey)
                 .compact();
-
+        log.debug("jwtToken: {}",jwtToken);
         return jwtToken;
     }	
 	
