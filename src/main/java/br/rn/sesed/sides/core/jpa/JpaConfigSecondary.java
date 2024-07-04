@@ -3,6 +3,7 @@ package br.rn.sesed.sides.core.jpa;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,12 +21,17 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 )
 public class JpaConfigSecondary {
 
+    @Value("${sides.jpa.datasource.rotafx}")
+    private String rotafxDatasource;
+
+
 	@Bean
     @ConfigurationProperties(prefix = "spring.datasource.secondary")
 	public DataSource secondaryDataSource() {
 		
 		JndiDataSourceLookup dataSourceLookup = new JndiDataSourceLookup();
-		DataSource dataSource = dataSourceLookup.getDataSource("java:/rotafxDS");
+//		DataSource dataSource = dataSourceLookup.getDataSource("java:/rotafxDS");
+        DataSource dataSource = dataSourceLookup.getDataSource(rotafxDatasource);
 		return dataSource;
 	}
 	

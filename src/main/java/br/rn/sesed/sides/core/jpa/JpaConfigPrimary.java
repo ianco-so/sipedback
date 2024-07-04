@@ -3,6 +3,7 @@ package br.rn.sesed.sides.core.jpa;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,13 +22,18 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 )
 public class JpaConfigPrimary {
 
+
+    @Value("${sides.jpa.datasource.sides}")
+    private String sidesDatasource;
+
 	@Bean
     @Primary
     @ConfigurationProperties(prefix = "spring.datasource.primary")
 	public DataSource primaryDataSource() {
 		
 		JndiDataSourceLookup dataSourceLookup = new JndiDataSourceLookup();
-		DataSource dataSource = dataSourceLookup.getDataSource("java:/sidesDS");
+		//DataSource dataSource = dataSourceLookup.getDataSource("java:/sidesDS");
+        DataSource dataSource = dataSourceLookup.getDataSource(sidesDatasource);
 		return dataSource;
 	}
 	
