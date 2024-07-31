@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import br.rn.sesed.sides.api.model.dto.UsuarioDto;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.core.ldap.LdapService;
-import br.rn.sesed.sides.core.security.Encrypt;
 import br.rn.sesed.sides.core.security.GenerateToken;
 import br.rn.sesed.sides.core.security.annotation.Security;
 import br.rn.sesed.sides.domain.desaparecidos.service.UsuarioService;
@@ -54,14 +53,22 @@ public class SidesController {
 	public String login(@RequestBody UsuarioLoginJson usuarioJson) throws Exception {
 		try {
 
-			String payload = usuarioJson.getSetor().concat(usuarioJson.getSenha().concat(usuarioJson.getCpf()));
-			if (Encrypt.generateHash(payload).equals(usuarioJson.getCode())) {
+			// String payload = usuarioJson.getSetor().concat(usuarioJson.getSenha().concat(usuarioJson.getCpf()));
+			// if (Encrypt.generateHash(payload).equals(usuarioJson.getCode())) {
+			// 	UsuarioDto user = ldapService.login(orgaoLogin, usuarioJson.getCpf(), usuarioJson.getSenha(), orgaoDomain);
+			// 	var token = generateToken.gerarToken(user.getNome(), user.getCpf(), user.getEmail());
+			// 	return token;
+			// } else {
+			// 	throw new Exception("Usuário Inválido");
+			// }
+			
+			
 				UsuarioDto user = ldapService.login(orgaoLogin, usuarioJson.getCpf(), usuarioJson.getSenha(), orgaoDomain);
 				var token = generateToken.gerarToken(user.getNome(), user.getCpf(), user.getEmail());
 				return token;
-			} else {
-				throw new Exception("Usuário Inválido");
-			}
+			
+
+
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			throw new Exception("Usuário inválido");

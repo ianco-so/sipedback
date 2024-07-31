@@ -55,6 +55,7 @@ import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
 import lombok.extern.slf4j.Slf4j;
 
 
+
 @Slf4j
 @RestController
 @RequestMapping("/registro")
@@ -130,7 +131,9 @@ public class RegistroController {
 	@ResponseStatus(HttpStatus.CREATED)
 	public @ResponseBody RegistroDto postNovoRegistro(@RequestBody RegistroJson registroJson) throws Exception {
 		try {
-				
+			
+			log.debug("Recebendo Json... {}", objectMapper.writeValueAsString(registroJson));
+			
 			Registro temp = registroService.salvar(registroJson);
 			RegistroDto dto = registroDtoConvert.toDto(temp);
 			return dto;

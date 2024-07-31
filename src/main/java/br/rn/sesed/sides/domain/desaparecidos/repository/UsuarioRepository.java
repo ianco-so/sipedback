@@ -20,6 +20,8 @@ public interface UsuarioRepository extends CustomJpaRepository<Usuario, Long> {
 
 	public Optional<Usuario> findByCpfAndSenha(String cpf, String senha);
 	
+	public Optional<Usuario> findByCnpjAndSenha(String cnpj, String senha);
+
 	public List<Usuario> findAllByBoValidado(Boolean boValidado);
 	
 }

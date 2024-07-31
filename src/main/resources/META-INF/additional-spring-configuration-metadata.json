@@ -8,5 +8,20 @@
     "name": "sides.ldap.ip-domain",
     "type": "java.lang.String",
     "description": "A description for 'sides.ldap.ip-domain'"
+  },
+  {
+    "name": "sides.jpa.datasource.sides",
+    "type": "java.lang.String",
+    "description": "A description for 'sides.jpa.datasource.sides'"
+  },
+  {
+    "name": "sides.jpa.datasource.rotafx",
+    "type": "java.lang.String",
+    "description": "A description for 'sides.jpa.datasource.rotafx'"
+  },
+  {
+    "name": "sides.authorization.enabled",
+    "type": "java.lang.String",
+    "description": "A description for 'sides.authorization.enabled'"
   }
 ]}

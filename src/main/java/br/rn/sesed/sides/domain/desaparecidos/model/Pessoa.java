@@ -24,6 +24,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @NoArgsConstructor
@@ -275,7 +276,6 @@ public class Pessoa {
 		this.stFotoprincipal = "images?imageId="+ this.id +"&imageName=fotoprincipal";
 		this.stSegundafoto = "images?imageId="+ this.id +"&imageName=segundafoto";
 		this.stTerceirafoto = "images?imageId="+ this.id +"&imageName=terceirafoto";
-
 
 		// fotoPrincipal.setContent(this.stFotoprincipal);
 		// segundaFoto.setContent(this.stSegundafoto);

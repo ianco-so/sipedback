@@ -5,7 +5,7 @@ import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -24,16 +24,17 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class SecurityInterceptor implements HandlerInterceptor{
 
-    @Autowired
-	private GenerateToken generateToken;
-
-
+    @Value("${sides.authorization.enabled}")
+    private Boolean enableAuthorization;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         
         try{
-            boolean authorization = false;
+
+            if(!enableAuthorization){
+                return true;
+            }
 
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             log.debug("URI -> {}", request.getRequestURI());
@@ -60,21 +61,21 @@ public class SecurityInterceptor implements HandlerInterceptor{
         }
     }
 
-    private boolean analiseCredenciais(String authorizationHeader) throws Exception{
-       try{ 
-        if (StringUtils.hasText(authorizationHeader) &&	authorizationHeader.startsWith(Constants.BEARER_SCHEMA)) {
-            authorizationHeader = authorizationHeader.replace(Constants.BEARER_SCHEMA, "");
-            SipedAutenticationToken sipedAuthenticationToken = getAuthenticationToken(authorizationHeader);
-            SecurityContextHolder.getContext().setAuthentication(sipedAuthenticationToken);
-        }else{
-            throw new Exception("Authentication invalid");
+    private boolean analiseCredenciais(String authorizationHeader) throws Exception {
+        try {
+            if (StringUtils.hasText(authorizationHeader) && authorizationHeader.startsWith(Constants.BEARER_SCHEMA)) {
+                authorizationHeader = authorizationHeader.replace(Constants.BEARER_SCHEMA, "");
+                SipedAutenticationToken sipedAuthenticationToken = getAuthenticationToken(authorizationHeader);
+                SecurityContextHolder.getContext().setAuthentication(sipedAuthenticationToken);
+            } else {
+                throw new Exception("Authentication invalid");
+            }
+
+            return true;
+
+        } catch (Exception e) {
+            throw e;
         }
-
-        return true;
-
-    }catch(Exception e){
-        throw e;
-    }
     }
 
 

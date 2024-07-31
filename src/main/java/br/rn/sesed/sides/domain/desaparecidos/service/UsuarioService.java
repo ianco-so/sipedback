@@ -19,7 +19,9 @@ import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.core.generator.RandomStringGeneratorService;
 import br.rn.sesed.sides.core.security.Encrypt;
 import br.rn.sesed.sides.core.security.GenerateToken;
+import br.rn.sesed.sides.domain.desaparecidos.model.AcessoEmpresa;
 import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
+import br.rn.sesed.sides.domain.desaparecidos.repository.AcessoEmpresaRepository;
 import br.rn.sesed.sides.domain.desaparecidos.repository.UsuarioRepository;
 import br.rn.sesed.sides.domain.exception.EntidadeNaoEncontradaException;
 import br.rn.sesed.sides.domain.exception.ErroAoSalvarUsuarioException;
@@ -36,124 +38,150 @@ public class UsuarioService {
 
 	@Autowired
 	private UsuarioDtoConvert usuarioDtoConvert;
-	
+
 	@Autowired
 	private GenerateToken generateToken;
-	
+
 	@Autowired
 	private RandomStringGeneratorService stringGeneratorService;
 
 	@Autowired
 	private NotificacaoService notificacaoService;
-	
+
 	@Autowired
 	private UsuarioRepository usuarioRepository;
 
 	@Autowired
-    private SpringTemplateEngine templateEngine;
-	
+	private AcessoEmpresaRepository acessoEmpresaRepository;
+
+	@Autowired
+	private SpringTemplateEngine templateEngine;
+
 	public UsuarioDto autenticarUsuario(UsuarioLoginJson usuarioJson) {
 		try {
+			Optional<Usuario> usuario;
 			usuarioJson.setCpf(usuarioJson.getCpf().replace(".", "").replace("-", ""));
-			Optional<Usuario> usuario = usuarioRepository.findByCpfAndSenha(usuarioJson.getCpf(), Encrypt.getMD5(usuarioJson.getSenha()));
-			if (usuario.isPresent()) {
-				if(usuario.get().getBoValidado()) {
-					UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
-					resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(),usuario.get().getCpf() , usuario.get().getEmail()));
-					return resultDto;					
-				}else {
-					throw new UsuarioNaoValidado();
+			if (usuarioJson.getCnpj() != null) {
+				usuarioJson.setCnpj(usuarioJson.getCnpj().replace(".", "").replace("-", "").replace("/", ""));
+				usuario = usuarioRepository.findByCnpjAndSenha(usuarioJson.getCnpj(), Encrypt.getMD5(usuarioJson.getSenha()));
+				var novoAcesso = new AcessoEmpresa();
+				novoAcesso.setUsuario(usuario.get());
+				novoAcesso.setCpf(usuarioJson.getCpf());
+				acessoEmpresaRepository.save(novoAcesso);
+				if (usuario.isPresent()) {
+					if (usuario.get().getBoValidado()) {
+						UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
+						resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(), usuario.get().getCnpj(), usuario.get().getEmail()));
+						return resultDto;
+					} else {
+						throw new UsuarioNaoValidado();
+					}
+				} else {
+					throw new UsuarioNaoEncontradoException("Usuario ou Senha inválidos, tente novamente.");
 				}
-			}else {
-				throw new UsuarioNaoEncontradoException("Usuario ou Senha inválidos, tente novamente.");
+			} else {
+				usuario = usuarioRepository.findByCpfAndSenha(usuarioJson.getCpf(), Encrypt.getMD5(usuarioJson.getSenha()));
+				if (usuario.isPresent()) {
+					if (usuario.get().getBoValidado()) {
+						UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
+						resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(), usuario.get().getCpf(), usuario.get().getEmail()));
+						return resultDto;
+					} else {
+						throw new UsuarioNaoValidado();
+					}
+				} else {
+					throw new UsuarioNaoEncontradoException("Usuario ou Senha inválidos, tente novamente.");
+				}
 			}
+			
+			
 		} catch (Exception e) {
 			throw new SidesException(e.getMessage());
 		}
 	}
-	
+
 	public void validaUsuario(Long id) {
 		try {
 			if (id != null) {
 				Usuario user = usuarioRepository.findById(id).get();
 				user.setBoValidado(true);
 				usuarioRepository.save(user);
-			}else {
+			} else {
 				throw new SidesException("O idd de usuario não pode ser nulo ou vazio");
 			}
-		}catch (NoSuchElementException e) {
+		} catch (NoSuchElementException e) {
 			throw new UsuarioNaoEncontradoException(id);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			throw new SidesException(e.getMessage());
 		}
 	}
 
 	public void ativarDesativarUsuario(Long id) {
-        try {
+		try {
 			if (id != null) {
 				Usuario user = usuarioRepository.findById(id).get();
 				user.setBoAtivo(!user.getBoAtivo());
 				usuarioRepository.save(user);
-			}else {
+			} else {
 				throw new SidesException("O id de usuario não pode ser nulo ou vazio");
 			}
-		}catch (NoSuchElementException e) {
+		} catch (NoSuchElementException e) {
 			throw new UsuarioNaoEncontradoException(id);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			throw new SidesException(e.getMessage());
 		}
-    }
-	
+	}
+
 	public Usuario localizarUsuarioPorNome(String usuarioNome) {
 		try {
 			if (!usuarioNome.isBlank()) {
-				return usuarioRepository.findByNome(usuarioNome).get();	
-			}else {
+				return usuarioRepository.findByNome(usuarioNome).get();
+			} else {
 				throw new SidesException("Nome de usuario não pode ser nulo ou vazio");
 			}
-		}catch (Exception e) {
-			throw new UsuarioNaoEncontradoException(1L,usuarioNome);
+		} catch (Exception e) {
+			throw new UsuarioNaoEncontradoException(1L, usuarioNome);
 		}
-	}	
-	
-	public Usuario localizarUsuarioPorId(Long usuarioId) {
-		try {			
-			return usuarioRepository.findById(usuarioId).get();
-		}catch (Exception e) {			
-			throw new UsuarioNaoEncontradoException(usuarioId);
-		}		
 	}
-	
+
+	public Usuario localizarUsuarioPorId(Long usuarioId) {
+		try {
+			return usuarioRepository.findById(usuarioId).get();
+		} catch (Exception e) {
+			throw new UsuarioNaoEncontradoException(usuarioId);
+		}
+	}
+
 	public Usuario localizarUsuarioPorCpf(String usuarioCpf) {
-		try {			
-			
+		try {
+
 			Usuario user = usuarioRepository.findByCpf(usuarioCpf).get();
-			
+
 			return user;
-		}catch (Exception e) {			
+		} catch (Exception e) {
 			throw new UsuarioNaoEncontradoException(usuarioCpf);
-		}		
+		}
 	}
 
 	public void salvar(Usuario usuario) {
 		try {
 			Optional<Usuario> user = usuarioRepository.findByCpfOrEmail(usuario.getCpf(), usuario.getEmail());
-			if(!user.isPresent()) {
+			if (!user.isPresent()) {
 				usuario.setCpf(usuario.getCpf().replace(".", "").replace("-", ""));
 				usuario.setSenha(Encrypt.getMD5(usuario.getSenha()));
 				usuarioRepository.save(usuario);
-			}else {
+			} else {
 				String msg = "Um registro já existe com estes dados.";
-				if(user.get().getCpf().equals(usuario.getCpf()) && user.get().getEmail().equals(usuario.getEmail())){
+				if (user.get().getCpf().equals(usuario.getCpf()) && user.get().getEmail().equals(usuario.getEmail())) {
 					msg = "Já existe um usuário cadastrado com este CPF e EMAIL. ";
-				}else if(user.get().getCpf().equals(usuario.getCpf())) {
+				} else if (user.get().getCpf().equals(usuario.getCpf())) {
 					msg = "Já existe um usuário cadastrado com este CPF. ";
-				}else if(user.get().getEmail().equals(usuario.getEmail())) {
+				} else if (user.get().getEmail().equals(usuario.getEmail())) {
 					msg = "Já existe um usuário cadastrado com este EMAIL. ";
-				}				
+				}
 				throw new ErroAoSalvarUsuarioException(msg);
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw e;
 		}
 	}
@@ -163,17 +191,12 @@ public class UsuarioService {
 		return usuarioRepository.save(usuario);
 	}
 
-
 	public Boolean recupararSenha(String cpf) {
-		try {	
-			
+		try {
+
 			Optional<Usuario> usuario = usuarioRepository.findByCpf(cpf);
 
-
-			if(usuario.isPresent()) {	
-				
-				
-
+			if (usuario.isPresent()) {
 
 				var novaSenha = stringGeneratorService.generateRandomString();
 
@@ -199,46 +222,44 @@ public class UsuarioService {
 
 				return true;
 			}
-			
+
 			throw new EntidadeNaoEncontradaException(cpf);
 
-		}catch (Exception e) {			
+		} catch (Exception e) {
 			throw e;
 		}
 	}
 
-
 	public void alterar(Usuario usuario) {
 		try {
 			Optional<Usuario> user = usuarioRepository.findByCpf(usuario.getCpf());
-			if(user.isPresent()) {
-				
+			if (user.isPresent()) {
+
 				String encriptedPassword = Encrypt.getMD5(usuario.getSenha());
 
 				user.get().setSenha(encriptedPassword);
 
 				usuarioRepository.save(user.get());
-				
-			}else {		
+
+			} else {
 				throw new ErroAoSalvarUsuarioException("Verifique usuario");
 			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			throw e;
 		}
-		
+
 	}
 
-	public List<UsuarioDto> getAllUsers(){
+	public List<UsuarioDto> getAllUsers() {
 		try {
-			//List<Usuario> ususariosnaovalidados = usuarioRepository.findAllByBoValidado(false);
+			// List<Usuario> ususariosnaovalidados =
+			// usuarioRepository.findAllByBoValidado(false);
 			List<Usuario> ususarios = usuarioRepository.findAll();
 			List<UsuarioDto> usersDto = usuarioDtoConvert.toCollectionModel(ususarios);
 			return usersDto;
-		}catch(Exception e) {
+		} catch (Exception e) {
 			throw e;
 		}
 	}
 
-
-	
 }

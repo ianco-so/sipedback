@@ -152,7 +152,7 @@ public class RegistroService {
 					ftpService.createDir(String.valueOf(pessoaSalva.getId()));
 				}
 				int idx = pessoa.getFotoPrincipal().getFileName().indexOf(".");
-				String nomeArquivo = pessoa.getFotoPrincipal().getFileName().replace(pessoa.getFotoPrincipal().getFileName().substring(0, idx),"fotoprinpial");
+				String nomeArquivo = pessoa.getFotoPrincipal().getFileName().replace(pessoa.getFotoPrincipal().getFileName().substring(0, idx),"fotoprincipal");
 				ftpService.uploadFile(String.valueOf(pessoaSalva.getId()) + "/" + String.valueOf(pessoaSalva.getId()) + "_" + nomeArquivo,
 				isFoto);
 			}

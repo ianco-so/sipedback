@@ -6,6 +6,7 @@ import lombok.Data;
 public class UsuarioDto {
 	private Long id;
 	private String nome;
+	private String cnpj;
 	private String cpf;
 	private String telefone;
 	private String email;

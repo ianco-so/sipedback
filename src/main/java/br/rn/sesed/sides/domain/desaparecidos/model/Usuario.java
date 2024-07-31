@@ -1,10 +1,15 @@
 package br.rn.sesed.sides.domain.desaparecidos.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.DynamicInsert;
@@ -31,6 +36,9 @@ public class Usuario {
 	
 	@Column(name="st_cpf")
 	private String cpf;
+
+	@Column(name="st_cnpj")
+	private String cnpj;
 	
 	@Column(name="st_fone_contato")
 	private String telefone;
@@ -64,5 +72,8 @@ public class Usuario {
 	
 	@Column(name = "bo_ativo")
 	private Boolean boAtivo;
+
+	@OneToMany(mappedBy="usuario", fetch = FetchType.LAZY)
+	List<AcessoEmpresa> acessosEmpresa = new ArrayList<>();
 	
 }
