@@ -20,8 +20,9 @@ import br.rn.sesed.sides.core.security.annotation.Security;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
+
 @Component
+@Slf4j
 public class SecurityInterceptor implements HandlerInterceptor{
 
     @Value("${sides.authorization.enabled}")
@@ -37,7 +38,7 @@ public class SecurityInterceptor implements HandlerInterceptor{
             }
 
             String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-            log.debug("URI -> {}", request.getRequestURI());
+
             if (handler instanceof HandlerMethod) {
                 HandlerMethod handlerMethod = (HandlerMethod) handler;
                 Method method = handlerMethod.getMethod();
