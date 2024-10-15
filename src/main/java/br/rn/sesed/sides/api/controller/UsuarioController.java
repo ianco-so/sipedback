@@ -19,6 +19,7 @@ import br.rn.sesed.sides.api.model.json.UsuarioJson;
 import br.rn.sesed.sides.api.model.json.UsuarioLoginJson;
 import br.rn.sesed.sides.api.serialization.UsuarioDtoConvert;
 import br.rn.sesed.sides.api.serialization.UsuarioJsonConvert;
+import br.rn.sesed.sides.core.security.Encrypt;
 import br.rn.sesed.sides.core.security.annotation.Security;
 import br.rn.sesed.sides.domain.desaparecidos.model.Usuario;
 import br.rn.sesed.sides.domain.desaparecidos.service.UsuarioService;
@@ -49,15 +50,15 @@ public class UsuarioController {
 		try {
 
 
-			// String payload = usuarioJson.getSetor().concat(usuarioJson.getSenha().concat(usuarioJson.getCpf()));
+			String payload = usuarioJson.getSetor().concat(usuarioJson.getSenha().concat(usuarioJson.getCpf()));
 
-			// if (Encrypt.generateHash(payload).equals(usuarioJson.getCode())){					
-			// 	return usuarioService.autenticarUsuario(usuarioJson);
-			//  }else {
-			// 	 throw new Exception("Usuário Inválido");
-			//  }
+			if (Encrypt.generateHash(payload).equals(usuarioJson.getCode())){					
+				return usuarioService.autenticarUsuario(usuarioJson);
+			 }else {
+				 throw new Exception("Usuário Inválido");
+			 }
 
-			return usuarioService.autenticarUsuario(usuarioJson);
+			// return usuarioService.autenticarUsuario(usuarioJson);
 
 
 		} catch (Exception e) {

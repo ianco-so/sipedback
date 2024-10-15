@@ -71,6 +71,8 @@ public class UsuarioService {
 				if (usuario.isPresent()) {
 					if (usuario.get().getBoValidado()) {
 						UsuarioDto resultDto = usuarioDtoConvert.toDto(usuario.get());
+						resultDto.setNome(usuarioJson.getNome());
+						resultDto.setCpf(usuarioJson.getCpf());
 						resultDto.setToken(generateToken.gerarToken(usuario.get().getNome(), usuario.get().getCnpj(), usuario.get().getEmail()));
 						return resultDto;
 					} else {

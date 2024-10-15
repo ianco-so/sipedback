@@ -5,14 +5,11 @@ import lombok.Data;
 @Data
 public class UsuarioLoginJson{
 	
-	private String cpf;
 	private String cnpj;
+	private String code;
+	private String cpf;
+	private String nome;
 	private String senha;
-
-	// @JsonIgnore
-	// private String code;
-	
-	// @JsonIgnore
-	// private String setor;
+	private String setor;
 	
 }
