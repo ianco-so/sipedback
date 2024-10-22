@@ -30,7 +30,7 @@ public class GenerateToken {
 	
 	private static final Log logger = LogFactory.getLog(GenerateToken.class);
 	private static final String CHAVE_REVALIDA = "f6622e29a37c586bbde48be9d81dea52fa30340386602959491c97d69fe906c8";
-	private static final Integer VALIDADE_MINUTES = 60; 
+	private static final Integer VALIDADE_MINUTES = 43200; 
 	
 	public GenerateToken() {
 	}
